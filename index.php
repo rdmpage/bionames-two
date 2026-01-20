@@ -152,10 +152,7 @@ function display_entity_details($doc)
 		else
 		{
 			$link_id = $main_entity->isBasedOn->id;
-			if (isset($main_entity->isBasedOn->name))
-			{
-				$link_name = $main_entity->isBasedOn->name;
-			}
+			$link_name = $main_entity->isBasedOn->name;
 		}
 		
 		$ns_id = id_to_key_value($link_id);
@@ -166,35 +163,23 @@ function display_entity_details($doc)
 	}
 	
 	if (isset($main_entity->isPartOf))
-	{	
-		$link_id = '';
+	{
 		$link_name = '[Unknown]';
-		
 		if (is_string($main_entity->isPartOf))
 		{
 			$link_id = $main_entity->isPartOf;
 		}
 		else
 		{
-			if (isset($main_entity->isPartOf->id))
-			{
-				$link_id = $main_entity->isPartOf->id;
-			}
+			$link_id = $main_entity->isPartOf->id;
 			$link_name = $main_entity->isPartOf->name;
 		}
 		
-		if ($link_id != '')
-		{
-			$ns_id = id_to_key_value($link_id);
-			
-			echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
-			echo $link_name;
-			echo '</a>';		
-		}
-		else
-		{
-			echo $link_name;
-		}
+		$ns_id = id_to_key_value($link_id);
+		
+		echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+		echo $link_name;
+		echo '</a>';
 	}	
 	
 	
@@ -215,13 +200,20 @@ function display_entity_details($doc)
 				
 				$item_ns = '';
 				$item_id = '';
-				
+
+				// Handle URL format: https://bionames.org/namespace/id
 				if (preg_match('/.org\/(.*)\/(.*)$/', $dataFeedElement->item->id, $m))
 				{
 					$item_ns = $m[1];
 					$item_id = $m[2];
 				}
-				
+				// Handle LSID format: urn:lsid:organismnames.com:name:id
+				elseif (preg_match('/urn:lsid:organismnames\.com:name:(.+)$/', $dataFeedElement->item->id, $m))
+				{
+					$item_ns = 'names';
+					$item_id = $m[1];
+				}
+
 				echo '<a href="?id=' . $item_id . '&namespace=' . $item_ns . '">';
 				
 				echo entity_name($dataFeedElement->item);
@@ -261,7 +253,7 @@ function display_entity_details($doc)
 			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'bibtex\')">BibTeX</button> ';
 			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'ris\')">RIS</button>';
 			echo '</div>';
-			echo '<div id="citation-output" style="display:none; padding:1em; background:#f5f5f5; border:1px solid #ddd; margin-top:1em;"></div>';
+			echo '<div id="citation-output" style="display:none; padding:1em; background:#f5f5f5; border:1px solid #ddd; margin-top:1em; word-wrap:break-word; overflow-wrap:break-word; white-space:pre-wrap;"></div>';
 			echo '</div>';
 		}
 	}
@@ -334,7 +326,10 @@ function display_html_start($title = '')
 	
 	echo '<script src="js/citation.js"></script>' . "\n";
 	echo '<script>
-		const Cite = require("citation-js");
+	// Citation.js is a CommonJS module, expose it globally
+	if (typeof require !== "undefined" && typeof module !== "undefined") {
+		window.Cite = require(1); // Require the main entry point
+	}
 	</script>' . "\n";
 
 	echo '<script>' . "\n";
@@ -354,12 +349,15 @@ main {
 	width:90vw;
 	padding:1em;
 	margin:auto;
-}';	
+}
 
-	echo '#citation-output > pre {
-		white-space:pre-wrap;
-	}';
-	
+/* citation output pre tags */
+#citation-output pre {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+}';
+
 	echo '</style>' . "\n";	
 
 	echo '</head>';
