@@ -258,7 +258,7 @@ function display_entity_details($doc)
 			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'bibtex\')">BibTeX</button> ';
 			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'ris\')">RIS</button>';
 			echo '</div>';
-			echo '<div id="citation-output" style="display:none; padding:1em; background:#f5f5f5; border:1px solid #ddd; margin-top:1em; word-wrap:break-word; overflow-wrap:break-word;"></div>';
+			echo '<div id="citation-output" style="display:none; padding:1em; background:#f5f5f5; border:1px solid #ddd; margin-top:1em; word-wrap:break-word; overflow-wrap:break-word; white-space:pre-wrap;"></div>';
 			echo '</div>';
 		}
 	}
