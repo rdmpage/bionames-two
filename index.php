@@ -236,22 +236,49 @@ function display_entity_details($doc)
 		}
 	}
 
+	// Citation display
+	if (isset($main_entity->encoding))
+	{
+		$csl_json = null;
+		foreach ($main_entity->encoding as $encoding)
+		{
+			if ($encoding->encodingFormat == 'application/vnd.citationstyles.csl+json')
+			{
+				$csl_json = $encoding->text;
+				break;
+			}
+		}
+
+		if ($csl_json)
+		{
+			echo '<div style="margin:2em 0;">';
+			echo '<h2>Formatted Citation</h2>';
+			echo '<div style="margin:1em 0;">';
+			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'apa\')">APA</button> ';
+			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'bibtex\')">BibTeX</button> ';
+			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'ris\')">RIS</button>';
+			echo '</div>';
+			echo '<div id="citation-output" style="display:none; padding:1em; background:#f5f5f5; border:1px solid #ddd; margin-top:1em;"></div>';
+			echo '</div>';
+		}
+	}
+
 	if (1)
 	{
 		// debug display simplified data
 		echo '<div style="font-family:monospace;white-space:pre-wrap;">';
-		echo json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);	
+		echo json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		echo '</div>';
-				
+
 		if (isset($main_entity->encoding))
 		{
 			foreach ($main_entity->encoding as $encoding)
 			{
 				if ($encoding->encodingFormat == 'application/pdf')
 				{
-					echo '<script>display_pdf("' . $encoding->contentUrl . '");</script>';		
+					echo '<script>display_pdf("' . $encoding->contentUrl . '");</script>';
 				}
-			}		
+			}
 		}
 	}
 }
@@ -302,8 +329,10 @@ function display_html_start($title = '')
     }
     echo '<title>' . htmlentities($title, ENT_HTML5). '</title>';
 	
+	echo '<script src="js/citation.min.js"></script>' . "\n";
+
 	echo '<script>' . "\n";
-	require_once (dirname(__FILE__) . '/display.js.inc.php');    
+	require_once (dirname(__FILE__) . '/display.js.inc.php');
 	echo '</script>' . "\n";
 
 	echo '<style>';	
