@@ -339,7 +339,10 @@ function display_navbar($q)
 	<ul>
 		<li><a href=".">Home</a></li>
 		<li>
-			<input class="search" id="search" type="text" placeholder="placeholder">
+			<form method="get" action="index.php" style="display:inline;">
+				<input class="search" id="search" name="q" type="text" placeholder="Search for name..." value="' . htmlspecialchars($q) . '">
+				<input type="submit" value="Search">
+			</form>
 		</li>
 		<li><a href="https://github.com/rdmpage/bold-view/issues" target="_new">Feedback</a></li>
 	</ul>
@@ -363,18 +366,67 @@ function display_main_end()
 function display_search($q)
 {
 	global $config;
-	
-	$title = $q;
-	
+
+	$title = 'Search: ' . $q;
+
+	$results = search($q);
+
 	display_html_start($title);
 	display_navbar($q);
 	display_main_start();
-	
-	echo '<h2>Search results</h2>';
-	echo '<ol><li>One</li><li>Two</li></ol>';
-	
-	display_main_end();	
-	display_html_end();	
+
+	echo '<h1>' . htmlspecialchars($results->name) . '</h1>';
+
+	if (count($results->dataFeedElement) == 0)
+	{
+		echo '<p>No results found for "' . htmlspecialchars($q) . '"</p>';
+	}
+	else
+	{
+		echo '<ul>';
+		foreach ($results->dataFeedElement as $dataFeedElement)
+		{
+			echo '<li>';
+
+			// Extract numeric ID from LSID
+			$item_id = '';
+			if (preg_match('/:name:(\d+)$/', $dataFeedElement->item->id, $m))
+			{
+				$item_id = $m[1];
+			}
+
+			if ($item_id)
+			{
+				echo '<a href="?namespace=names&id=' . $item_id . '">';
+			}
+
+			echo '<em>' . htmlspecialchars($dataFeedElement->item->name) . '</em>';
+
+			if (isset($dataFeedElement->item->author))
+			{
+				echo ' ' . htmlspecialchars($dataFeedElement->item->author);
+			}
+
+			if ($item_id)
+			{
+				echo '</a>';
+			}
+
+			echo '</li>';
+		}
+		echo '</ul>';
+	}
+
+	// Debug display
+	if (1)
+	{
+		echo '<div style="font-family:monospace;white-space:pre-wrap;">';
+		echo json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		echo '</div>';
+	}
+
+	display_main_end();
+	display_html_end();
 }
 
 //----------------------------------------------------------------------------------------
@@ -511,9 +563,70 @@ function main()
 		exit(0);
 	}
 	
-	// Taxonomy browser
-	
-	
+	// Taxonomy browser (treemap)
+	if (isset($_GET['treemap']))
+	{
+		$group = '';
+		if (isset($_GET['group']))
+		{
+			$group = $_GET['group'];
+		}
+
+		display_treemap($group);
+		exit(0);
+	}
+
+}
+
+//----------------------------------------------------------------------------------------
+function display_treemap($group = '')
+{
+	global $config;
+
+	$tree_data = get_taxonomy_tree($group);
+
+	$title = $group == '' ? 'Taxonomic Browser' : 'Taxonomy: ' . $group;
+
+	display_html_start($title);
+	display_navbar('');
+	display_main_start();
+
+	echo '<h1>' . htmlspecialchars($title) . '</h1>';
+
+	// Breadcrumb navigation
+	if ($group != '')
+	{
+		$parts = explode(';', $group);
+		echo '<div class="breadcrumb">';
+		echo '<a href="?treemap">All</a>';
+
+		$path = '';
+		foreach ($parts as $part)
+		{
+			$path .= ($path == '' ? '' : ';') . $part;
+			echo ' &gt; <a href="?treemap&group=' . urlencode($path) . '">' . htmlspecialchars($part) . '</a>';
+		}
+		echo '</div>';
+	}
+
+	// Container for treemap
+	echo '<div id="treemap" style="width:100%; height:600px;"></div>';
+
+	// Embed the tree data as JSON
+	echo '<script>';
+	echo 'var treeData = ' . json_encode($tree_data) . ';';
+	echo '</script>';
+
+	// Debug display
+	if (1)
+	{
+		echo '<div style="font-family:monospace;white-space:pre-wrap;">';
+		echo json_encode($tree_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		echo '</div>';
+	}
+
+	display_main_end();
+	display_html_end();
 }
 
 main();

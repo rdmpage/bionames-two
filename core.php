@@ -142,11 +142,10 @@ function get_entity($namespace, $id)
 
 //----------------------------------------------------------------------------------------
 function search($text)
-{	
-	$obj = new stdclass;
-	$obj->title = "Search for " . $text;
-	
-	return $obj;
+{
+	$feed = search_names($text);
+
+	return $feed;
 }
 
 

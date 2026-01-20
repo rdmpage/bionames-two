@@ -629,25 +629,25 @@ function get_container_list($letter = 'A')
 function get_name($id, $expand = true)
 {
 	$obj = null;
-	
+
 	$sql = "SELECT * FROM names WHERE id=$id LIMIT 1";
-	
+
 	$data = db_get($sql);
-	
+
 	$keys = ['id', 'nameComplete', 'taxonAuthor', 'rank', 'group',
 		'uninomial', 'genusPart', 'infragenericEpithet', 'specificEpithet', 'specificStem', 'infraspecificEpithet', 'infraspecificStem', 'publication', 'sici'];
-	
+
 	foreach ($data as $row)
 	{
 		$obj = new stdclass;
-		
-		$context = create_context();			
-		$context = add_work_context($context);										
-		$context = add_taxon_context($context);										
-		$obj->{'@context'} = $context;	
-										
+
+		$context = create_context();
+		$context = add_work_context($context);
+		$context = add_taxon_context($context);
+		$obj->{'@context'} = $context;
+
 		$obj->type = 'TaxonName';
-	
+
 		foreach ($keys as $k)
 		{
 			if (isset($row->{$k}))
@@ -656,16 +656,16 @@ function get_name($id, $expand = true)
 				{
 					case 'id':
 						$obj->id = 'urn:lsid:organismnames.com:name:' . $row->{$k};
-						
-						// $obj->scientificNameID = $obj->{'@id'};						
-						
+
+						// $obj->scientificNameID = $obj->{'@id'};
+
 						$obj->sameAs = 'https://lsid.io/' .  $obj->id;
 						break;
 
 					case 'nameComplete':
 						$obj->name = $row->{$k};
 						break;
-						
+
 					case 'taxonAuthor':
 						$obj->author = $row->{$k};
 						break;
@@ -673,7 +673,7 @@ function get_name($id, $expand = true)
 					case 'rank':
 						$obj->taxonRank = $row->{$k};
 						break;
-						
+
 					// parts of a name
 					case 'genusPart':
 						$obj->genericName = $row->{$k};
@@ -696,19 +696,19 @@ function get_name($id, $expand = true)
 						}
 						break;
 
-/*				
-				
+/*
+
 					case 'group':
 						$obj->lineage = explode(';', $row->{$k});
 						break;
-*/					
+*/
 					default:
 						break;
 				}
 			}
 		}
 	}
-	
+
 	if ($obj)
 	{
 		//$obj->related = get_related_names($id);
@@ -718,10 +718,162 @@ function get_name($id, $expand = true)
 
 }
 
+//----------------------------------------------------------------------------------------
+// Search for taxonomic names by exact match on nameComplete field
+function search_names($query)
+{
+	$feed = new stdclass;
+	$feed->{'@context'} = create_context();
+	$feed->{'@context'} = add_taxon_context($feed->{'@context'});
+	$feed->type = 'DataFeed';
+	$feed->name = 'Search results for "' . $query . '"';
+
+	$feed->dataFeedElement = [];
+
+	// Escape query for SQL
+	$escaped_query = str_replace("'", "''", $query);
+
+	$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE nameComplete = '$escaped_query'";
+
+	$data = db_get($sql);
+
+	foreach ($data as $row)
+	{
+		$item = new stdclass;
+		$item->type = 'DataFeedItem';
+
+		$name = new stdclass;
+		$name->type = 'TaxonName';
+		$name->id = 'urn:lsid:organismnames.com:name:' . $row->id;
+		$name->name = $row->nameComplete;
+
+		if (isset($row->taxonAuthor))
+		{
+			$name->author = $row->taxonAuthor;
+		}
+
+		$item->item = $name;
+		$feed->dataFeedElement[] = $item;
+	}
+
+	return $feed;
+}
+
+//----------------------------------------------------------------------------------------
+// Get taxonomic hierarchy for treemap visualization
+// Returns hierarchical structure with counts for each taxon
+function get_taxonomy_tree($parent_path = '')
+{
+	$sql = "SELECT DISTINCT `group` FROM names WHERE `group` IS NOT NULL";
+
+	if ($parent_path != '')
+	{
+		$escaped_path = str_replace("'", "''", $parent_path);
+		$sql .= " AND `group` LIKE '$escaped_path%'";
+	}
+
+	$data = db_get($sql);
+
+	// Build hierarchy
+	$tree = new stdclass;
+	$tree->name = $parent_path == '' ? 'Life' : $parent_path;
+	$tree->children = [];
+
+	$groups = [];
+
+	foreach ($data as $row)
+	{
+		if (isset($row->group))
+		{
+			$lineage = explode(';', $row->group);
+
+			// Find the next level down from parent
+			$depth = $parent_path == '' ? 0 : count(explode(';', $parent_path));
+
+			if (isset($lineage[$depth]))
+			{
+				$taxon = $lineage[$depth];
+
+				if (!isset($groups[$taxon]))
+				{
+					$groups[$taxon] = 0;
+				}
+				$groups[$taxon]++;
+			}
+		}
+	}
+
+	// Convert to tree structure
+	foreach ($groups as $taxon => $count)
+	{
+		$child = new stdclass;
+		$child->name = $taxon;
+		$child->value = $count;
+
+		// Build full path for this taxon
+		if ($parent_path == '')
+		{
+			$child->path = $taxon;
+		}
+		else
+		{
+			$child->path = $parent_path . ';' . $taxon;
+		}
+
+		$tree->children[] = $child;
+	}
+
+	return $tree;
+}
+
+//----------------------------------------------------------------------------------------
+// Get names within a specific taxonomic group
+function get_names_in_group($group_path)
+{
+	$feed = new stdclass;
+	$feed->{'@context'} = create_context();
+	$feed->{'@context'} = add_taxon_context($feed->{'@context'});
+	$feed->type = 'DataFeed';
+	$feed->name = 'Names in ' . $group_path;
+
+	$feed->dataFeedElement = [];
+
+	$escaped_path = str_replace("'", "''", $group_path);
+	$sql = "SELECT id, nameComplete, taxonAuthor, rank FROM names WHERE `group` LIKE '$escaped_path%' LIMIT 100";
+
+	$data = db_get($sql);
+
+	foreach ($data as $row)
+	{
+		$item = new stdclass;
+		$item->type = 'DataFeedItem';
+
+		$name = new stdclass;
+		$name->type = 'TaxonName';
+		$name->id = 'urn:lsid:organismnames.com:name:' . $row->id;
+		$name->name = $row->nameComplete;
+
+		if (isset($row->taxonAuthor))
+		{
+			$name->author = $row->taxonAuthor;
+		}
+
+		if (isset($row->rank))
+		{
+			$name->taxonRank = $row->rank;
+		}
+
+		$item->item = $name;
+		$feed->dataFeedElement[] = $item;
+	}
+
+	return $feed;
+}
+
 if (0)
 {
 	$feed = get_container_list('E');
-	
+
 	print_r($feed);
 }
 
