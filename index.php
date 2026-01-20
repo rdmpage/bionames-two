@@ -152,7 +152,10 @@ function display_entity_details($doc)
 		else
 		{
 			$link_id = $main_entity->isBasedOn->id;
-			$link_name = $main_entity->isBasedOn->name;
+			if (isset($main_entity->isBasedOn->name))
+			{
+				$link_name = $main_entity->isBasedOn->name;
+			}
 		}
 		
 		$ns_id = id_to_key_value($link_id);
