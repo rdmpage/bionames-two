@@ -331,10 +331,7 @@ function display_html_start($title = '')
 	
 	echo '<script src="js/citation.js"></script>' . "\n";
 	echo '<script>
-	// Citation.js is a CommonJS module, expose it globally
-	if (typeof require !== "undefined" && typeof module !== "undefined") {
-		window.Cite = require(1); // Require the main entry point
-	}
+		const Cite = require("citation-js");
 	</script>' . "\n";
 
 	echo '<script>' . "\n";

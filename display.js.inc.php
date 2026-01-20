@@ -20,10 +20,6 @@ function display_pdf(pdf_url) {
 
 // Render citation from CSL JSON
 function display_citation(cslJson, format) {
-	if (!window.Cite) {
-		return 'Citation.js library not loaded';
-	}
-
 	try {
 		var cite = new Cite(cslJson);
 
