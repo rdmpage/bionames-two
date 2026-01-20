@@ -317,7 +317,13 @@ function display_html_start($title = '')
     }
     echo '<title>' . htmlentities($title, ENT_HTML5). '</title>';
 	
-	echo '<script src="js/citation.min.js"></script>' . "\n";
+	echo '<script src="js/citation.js"></script>' . "\n";
+	echo '<script>
+	// Citation.js is a CommonJS module, expose it globally
+	if (typeof require !== "undefined" && typeof module !== "undefined") {
+		window.Cite = require(1); // Require the main entry point
+	}
+	</script>' . "\n";
 
 	echo '<script>' . "\n";
 	require_once (dirname(__FILE__) . '/display.js.inc.php');
