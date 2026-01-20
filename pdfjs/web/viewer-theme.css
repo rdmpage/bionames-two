@@ -1,0 +1,64 @@
+/* Custom theme overrides for pdf.js viewer
+ * Supports light and dark modes via CSS custom properties
+ */
+
+:root {
+  /* Light mode colors (default) */
+  --viewer-bg-color: #f4f4f4;
+  --viewer-toolbar-bg: #f9f9f9;
+  --viewer-toolbar-border: #d9d9d9;
+  --viewer-sidebar-bg: #ffffff;
+  --viewer-text-color: #000000;
+  --viewer-button-hover-bg: #e6e6e6;
+  --viewer-container-bg: #e8e8e8;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --viewer-bg-color: #2b2b2b;
+    --viewer-toolbar-bg: #323232;
+    --viewer-toolbar-border: #1a1a1a;
+    --viewer-sidebar-bg: #2b2b2b;
+    --viewer-text-color: #e8e8e8;
+    --viewer-button-hover-bg: #404040;
+    --viewer-container-bg: #1e1e1e;
+  }
+}
+
+/* Apply theme colors to viewer components */
+#viewerContainer {
+  background-color: var(--viewer-bg-color) !important;
+}
+
+.toolbar {
+  background-color: var(--viewer-toolbar-bg) !important;
+  border-bottom-color: var(--viewer-toolbar-border) !important;
+  color: var(--viewer-text-color) !important;
+}
+
+#sidebarContainer {
+  background-color: var(--viewer-sidebar-bg) !important;
+  color: var(--viewer-text-color) !important;
+}
+
+.doorHanger,
+.doorHangerRight {
+  background-color: var(--viewer-toolbar-bg) !important;
+  border-color: var(--viewer-toolbar-border) !important;
+  color: var(--viewer-text-color) !important;
+}
+
+.toolbarButton:hover,
+.secondaryToolbarButton:hover {
+  background-color: var(--viewer-button-hover-bg) !important;
+}
+
+.pdfViewer {
+  background-color: var(--viewer-container-bg) !important;
+}
+
+/* Keep PDF pages white in both modes for readability */
+.page {
+  background-color: white !important;
+}
