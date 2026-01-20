@@ -372,7 +372,51 @@ function get_reference_csl($id)
 }
 
 //----------------------------------------------------------------------------------------
-// Get container, use most common name as the name, and store the others as alternateNames 
+// Get names published in a reference
+function get_names_in_reference($sici)
+{
+	$feed = new stdclass;
+	$feed->{'@context'} = create_context();
+	$feed->{'@context'} = add_taxon_context($feed->{'@context'});
+	$feed->type = 'DataFeed';
+	$feed->name = 'Names published in this reference';
+
+	$feed->dataFeedElement = [];
+
+	$escaped_sici = str_replace("'", "''", $sici);
+	$sql = "SELECT id, nameComplete, taxonAuthor, rank FROM names WHERE sici='$escaped_sici' ORDER BY nameComplete";
+
+	$data = db_get($sql);
+
+	foreach ($data as $row)
+	{
+		$item = new stdclass;
+		$item->type = 'DataFeedItem';
+
+		$name = new stdclass;
+		$name->type = 'TaxonName';
+		$name->id = 'urn:lsid:organismnames.com:name:' . $row->id;
+		$name->name = $row->nameComplete;
+
+		if (isset($row->taxonAuthor))
+		{
+			$name->author = $row->taxonAuthor;
+		}
+
+		if (isset($row->rank))
+		{
+			$name->taxonRank = $row->rank;
+		}
+
+		$item->item = $name;
+		$feed->dataFeedElement[] = $item;
+	}
+
+	return $feed;
+}
+
+//----------------------------------------------------------------------------------------
+// Get container, use most common name as the name, and store the others as alternateNames
 //
 function get_container($namespace, $id)
 {

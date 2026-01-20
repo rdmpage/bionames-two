@@ -128,6 +128,9 @@ function get_entity($namespace, $id)
 		case 'references':
 			$doc = get_reference($id);
 			$entity[] = $doc;
+
+			$doc = get_names_in_reference($id);
+			$entity[] = $doc;
 			break;			
 
 		default:

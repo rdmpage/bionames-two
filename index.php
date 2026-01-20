@@ -200,13 +200,20 @@ function display_entity_details($doc)
 				
 				$item_ns = '';
 				$item_id = '';
-				
+
+				// Handle URL format: https://bionames.org/namespace/id
 				if (preg_match('/.org\/(.*)\/(.*)$/', $dataFeedElement->item->id, $m))
 				{
 					$item_ns = $m[1];
 					$item_id = $m[2];
 				}
-				
+				// Handle LSID format: urn:lsid:organismnames.com:name:id
+				elseif (preg_match('/urn:lsid:organismnames\.com:name:(.+)$/', $dataFeedElement->item->id, $m))
+				{
+					$item_ns = 'names';
+					$item_id = $m[1];
+				}
+
 				echo '<a href="?id=' . $item_id . '&namespace=' . $item_ns . '">';
 				
 				echo entity_name($dataFeedElement->item);
@@ -342,8 +349,15 @@ main {
 	width:90vw;
 	padding:1em;
 	margin:auto;
-}';	
-	
+}
+
+/* citation output pre tags */
+#citation-output pre {
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+}';
+
 	echo '</style>' . "\n";	
 
 	echo '</head>';
