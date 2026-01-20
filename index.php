@@ -400,7 +400,7 @@ function display_search($q)
 				echo '<a href="?namespace=names&id=' . $item_id . '">';
 			}
 
-			echo '<em>' . htmlspecialchars($dataFeedElement->item->name) . '</em>';
+			echo htmlspecialchars($dataFeedElement->item->name);
 
 			if (isset($dataFeedElement->item->author))
 			{

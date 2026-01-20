@@ -722,6 +722,9 @@ function get_name($id, $expand = true)
 // Search for taxonomic names by exact match on nameComplete field
 function search_names($query)
 {
+	// Trim leading and trailing whitespace
+	$query = trim($query);
+
 	$feed = new stdclass;
 	$feed->{'@context'} = create_context();
 	$feed->{'@context'} = add_taxon_context($feed->{'@context'});
