@@ -144,6 +144,7 @@ function display_entity_details($doc)
 	// specific 
 	if (isset($main_entity->isBasedOn))
 	{
+		$link_id = '';
 		$link_name = '[Unknown]';
 		if (is_string($main_entity->isBasedOn))
 		{
@@ -151,19 +152,33 @@ function display_entity_details($doc)
 		}
 		else
 		{
-			$link_id = $main_entity->isBasedOn->id;
-			$link_name = $main_entity->isBasedOn->name;
+			if (isset($main_entity->isBasedOn->id))
+			{
+				$link_id = $main_entity->isBasedOn->id;
+			}
+			if (isset($main_entity->isBasedOn->name))
+			{
+				$link_name = $main_entity->isBasedOn->name;
+			}
 		}
 		
-		$ns_id = id_to_key_value($link_id);
-		
-		echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
-		echo $link_name;
-		echo '</a>';
+		if ($link_id != '')
+		{			
+			$ns_id = id_to_key_value($link_id);
+			
+			echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+			echo $link_name;
+			echo '</a>';
+		}
+		else
+		{
+			echo $link_name;
+		}
 	}
 	
 	if (isset($main_entity->isPartOf))
 	{
+		$link_id = '';
 		$link_name = '[Unknown]';
 		if (is_string($main_entity->isPartOf))
 		{
@@ -171,15 +186,28 @@ function display_entity_details($doc)
 		}
 		else
 		{
-			$link_id = $main_entity->isPartOf->id;
-			$link_name = $main_entity->isPartOf->name;
+			if (isset($main_entity->isPartOf->id))
+			{
+				$link_id = $main_entity->isPartOf->id;
+			}
+			if (isset($main_entity->isPartOf->name))
+			{
+				$link_name = $main_entity->isPartOf->name;
+			}
 		}
 		
-		$ns_id = id_to_key_value($link_id);
-		
-		echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
-		echo $link_name;
-		echo '</a>';
+		if ($link_id != '')
+		{			
+			$ns_id = id_to_key_value($link_id);
+			
+			echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+			echo $link_name;
+			echo '</a>';
+		}
+		else
+		{
+			echo $link_name;
+		}
 	}	
 	
 	
