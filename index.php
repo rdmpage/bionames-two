@@ -105,7 +105,6 @@ function display_entity_details($doc)
 	echo '<h1>' . entity_name($main_entity) . '</h1>';
 	
 	// identifiers
-
 	echo '<dl>';
 	if (isset($main_entity->doi))
 	{
@@ -123,7 +122,6 @@ function display_entity_details($doc)
 		echo '<dt>OCLC</dt>';				
 		echo '<dd>' . external_identifier_link('oclc', $main_entity->oclc) . '</dd>';		
 	}
-	
 	echo '</dl>';
 	
 	
@@ -140,6 +138,63 @@ function display_entity_details($doc)
 		
 		echo '</ul>';
 	}
+	
+	if ($main_entity->type == 'TaxonName')
+	{
+		if (isset($main_entity->higherClassification))
+		{
+			$breadcrumbs = array();
+
+			$parts = explode(';', $main_entity->higherClassification);
+			
+			$image = '';
+			$link = '';			
+			foreach ($parts as $part)
+			{
+				$breadcrumb = new stdclass;
+				
+				if ($link == '')
+				{
+					$link = $part;
+				}
+				else
+				{
+					$link = $link . ';' . $part;
+				}
+				$breadcrumb->link = $link;
+				$breadcrumb->label = preg_replace('/^\w+__/', '', $part);
+				$breadcrumbs[] = $breadcrumb;
+				
+				$extension = 'png';
+				$extension = 'svg';
+				
+				$image_filename = dirname(__FILE__) . '/images/' . $breadcrumb->label . '.' . $extension;
+				if (file_exists($image_filename))
+				{
+					$image = 'images/' . $breadcrumb->label . '.' . $extension;
+				}
+			}
+			
+			$n = count($breadcrumbs);
+			
+			for ($i = 0; $i < $n; $i++)
+			{
+				echo '<a href="' . $breadcrumbs[$i]->link . '">' . $breadcrumbs[$i]->label . '</a>';
+				if ($i < $n - 1)
+				{
+					echo ' / ';
+				}
+			}
+			
+			if ($image != '')
+			{
+				echo '<div><img height="60" src="' . $image . '"></div>';
+			}
+		
+			
+		}
+	}
+	
 	
 	// specific 
 	if (isset($main_entity->isBasedOn))

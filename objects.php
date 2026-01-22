@@ -100,6 +100,7 @@ function add_taxon_context($context)
 	$context->specificEpithet      = 'dwc:specificEpithet';
 	$context->infraspecificEpithet = 'dwc:infraspecificEpithet';
 	$context->scientificNameID     = 'dwc:scientificNameID';
+	$context->higherClassification = 'dwc:higherClassification';
 
 	return $context;
 }
@@ -742,12 +743,10 @@ function get_name($id, $expand = true)
 						}
 						break;
 
-/*
-
 					case 'group':
-						$obj->lineage = explode(';', $row->{$k});
+						$obj->higherClassification = $row->{$k};
 						break;
-*/
+						
 					default:
 						break;
 				}
