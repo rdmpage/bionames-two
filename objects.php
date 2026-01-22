@@ -785,13 +785,13 @@ function search_names($query)
 		$genus_name = trim($matches[1]);
 		$escaped_genus = str_replace("'", "''", $genus_name);
 
-		$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE genusPart = '$escaped_genus'";
+		$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE genusPart = '$escaped_genus' ORDER BY nameComplete";
 	}
 	else
 	{
 		// Regular exact name search
 		$escaped_query = str_replace("'", "''", $query);
-		$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE nameComplete = '$escaped_query'";
+		$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE nameComplete = '$escaped_query' ORDER BY nameComplete";
 	}
 
 	$data = db_get($sql);
