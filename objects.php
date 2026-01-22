@@ -981,11 +981,6 @@ function get_database_stats()
 	$data = db_get($sql);
 	$stats->names_with_dois = $data[0]->count;
 
-	// Number of distinct journals
-	$sql = "SELECT COUNT(DISTINCT journal) as count FROM names WHERE journal IS NOT NULL AND journal != ''";
-	$data = db_get($sql);
-	$stats->distinct_journals = $data[0]->count;
-
 	return $stats;
 }
 

@@ -722,9 +722,6 @@ function default_display($error_msg = '')
 
 		echo '<dt>Names with DOIs</dt>';
 		echo '<dd>' . number_format($stats->names_with_dois) . '</dd>';
-
-		echo '<dt>Distinct journals</dt>';
-		echo '<dd>' . number_format($stats->distinct_journals) . '</dd>';
 		echo '</dl>';
 	}
 
