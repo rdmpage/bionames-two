@@ -634,55 +634,58 @@ function display_search($q)
 }
 
 //----------------------------------------------------------------------------------------
-function display_container_list($letter = 'A')
+function display_container_list($letter = '')
 {
-	$doc = get_container_list($letter);
-	
-	display_html_start($letter);
+	display_html_start($letter == '' ? 'Containers' : $letter);
 	display_navbar('');
 	display_main_start();
-	
+
 	$letters = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
-		
+
 	echo '<ul style="list-style-type: none;display:block;overflow: auto;">';
-	foreach ($letters as $one_letter) 
+	foreach ($letters as $one_letter)
 	{
 		echo '<li style="float: left;padding:0.3em"><a href="?containers&letter=' . $one_letter . '">' . $one_letter . '</a></li>';
 	}
 	echo '</ul>';
 
-	echo '<h1>' . $letter . '</h1>';
-	
-	// list of titles...		
-	echo '<div class="multicolumn">';
-	echo '<ul>';
-	
-	foreach ($doc->dataFeedElement as $container)
+	if ($letter != '')
 	{
-		echo '<li>';
-		//echo '<a href="' . $work->{'@id'} . '">' . $work->item->name . '</a>';
-		
-		if (isset($container->item->id))
+		$doc = get_container_list($letter);
+
+		echo '<h1>' . $letter . '</h1>';
+
+		// list of titles...
+		echo '<div class="multicolumn">';
+		echo '<ul>';
+
+		foreach ($doc->dataFeedElement as $container)
 		{
-			echo '<a href="' . internal_identifier_link($container->item->id) . '">';
+			echo '<li>';
+			//echo '<a href="' . $work->{'@id'} . '">' . $work->item->name . '</a>';
+
+			if (isset($container->item->id))
+			{
+				echo '<a href="' . internal_identifier_link($container->item->id) . '">';
+			}
+
+			echo $container->item->name;
+
+			if (isset($container->item->id))
+			{
+				echo '</a>';
+			}
+
+
+			echo '</li>';
 		}
-		
-		echo $container->item->name;
-		
-		if (isset($container->item->id))
-		{
-			echo '</a>';
-		}
-		
-		
-		echo '</li>';			
+
+		echo '</ul>';
+		echo '</div>';
 	}
-			
-	echo '</ul>';
-	echo '</div>';
-	
-	display_main_end();	
-	display_html_end();	
+
+	display_main_end();
+	display_html_end();
 }
 
 
@@ -754,14 +757,14 @@ function main()
 		exit(0);
 	}	
 	
-	// Show list of containers (entity by name)			
+	// Show list of containers (entity by name)
 	if (isset($_GET['containers']))
-	{	
-		$letter = 'A';		
+	{
+		$letter = '';
 		if (isset($_GET['letter']))
 		{
 			$letter = $_GET['letter'];
-		}	
+		}
 
 		display_container_list($letter);
 		exit(0);
