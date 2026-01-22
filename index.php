@@ -20,15 +20,19 @@ function external_identifier_link($namespace, $value)
 	switch ($namespace)
 	{
 		case 'doi':
-			$html = '<a href="https://doi.org/' . $value . '">' . $value . '</a>';			
+			$html = '<a href="https://doi.org/' . $value . '" target="_new">' . $value . '</a>';			
 			break;
 
 		case 'issn':
-			$html = '<a href="http://portal.issn.org/resource/ISSN/' . $value . '">' . $value . '</a>';			
+			$html = '<a href="http://portal.issn.org/resource/ISSN/' . $value . '" target="_new">' . $value . '</a>';			
+			break;
+			
+		case 'lsid':
+			$html = '<a href="https://lsid.io/' . $value . '" target="_new">' . $value . '</a>';			
 			break;
 
 		case 'oclc':
-			$html = '<a href="https://worldcat.org/oclc/' . $value . '">' . $value . '</a>';			
+			$html = '<a href="https://worldcat.org/oclc/' . $value . '" target="_new">' . $value . '</a>';			
 			break;
 						
 		default:
@@ -106,6 +110,16 @@ function display_entity_details($doc)
 	
 	// identifiers
 	echo '<dl>';
+	
+	if (isset($main_entity->id))
+	{
+		if (preg_match('/^urn:lsid/', $main_entity->id))
+		{
+			echo '<dt>LSID</dt>';				
+			echo '<dd>' . external_identifier_link('lsid', $main_entity->id) . '</dd>';					
+		}
+	}	
+	
 	if (isset($main_entity->doi))
 	{
 		echo '<dt>DOI</dt>';				
