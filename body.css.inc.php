@@ -28,7 +28,7 @@ dt {
 dd {
   margin: 0;
   grid-column-start: 2;
-  font-weight: bold;
+  /* font-weight: bold; */
 }  
 
 .search {

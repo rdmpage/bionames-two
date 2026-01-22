@@ -166,9 +166,12 @@ function display_entity_details($doc)
 		{			
 			$ns_id = id_to_key_value($link_id);
 			
+			echo '<div>';
+			echo '<h3>Based on</h3>';
 			echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
 			echo $link_name;
 			echo '</a>';
+			echo '</div>';
 		}
 		else
 		{
@@ -274,14 +277,14 @@ function display_entity_details($doc)
 
 		if ($csl_json)
 		{
-			echo '<div style="margin:2em 0;">';
+			echo '<div>';
 			echo '<h2>Formatted Citation</h2>';
-			echo '<div style="margin:1em 0;">';
+			echo '<div>';
 			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'apa\')">APA</button> ';
 			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'bibtex\')">BibTeX</button> ';
 			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'ris\')">RIS</button>';
 			echo '</div>';
-			echo '<div id="citation-output" style="display:none; padding:1em; background:#f5f5f5; border:1px solid #ddd; margin-top:1em; word-wrap:break-word; overflow-wrap:break-word; white-space:pre-wrap;"></div>';
+			echo '<div id="citation-output""></div>';
 			echo '</div>';
 		}
 	}
@@ -289,7 +292,8 @@ function display_entity_details($doc)
 	if (1)
 	{
 		// debug display simplified data
-		echo '<div style="font-family:monospace;white-space:pre-wrap;">';
+		echo '<h2>Data</h2>';
+		echo '<div style="font-family:monospace;white-space:pre-wrap;border:1px solid #CCC;padding:1em;">';
 		echo json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		echo '</div>';
 
@@ -376,6 +380,17 @@ main {
 	margin:auto;
 }
 
+#citation-output {
+	display:none; 
+	padding:1em; 
+	background:#f5f5f5; 
+	border:1px solid #ddd; 
+	margin-top:1em; 
+	white-space: pre-wrap;
+	word-wrap: break-word;
+	overflow-wrap: break-word;
+}
+
 /* citation output pre tags */
 #citation-output pre {
 	white-space: pre-wrap;
@@ -418,7 +433,8 @@ function display_navbar($q)
 				<input type="submit" value="Search">
 			</form>
 		</li>
-		<li><a href="https://github.com/rdmpage/bold-view/issues" target="_new">Feedback</a></li>
+		<li><a href="?containers">Containers</a></li>
+		<li><a href="https://github.com/rdmpage/bionames-two/issues" target="_new">Feedback</a></li>
 	</ul>
 	</nav>';
 
@@ -494,7 +510,7 @@ function display_search($q)
 	// Debug display
 	if (1)
 	{
-		echo '<div style="font-family:monospace;white-space:pre-wrap;">';
+		echo '<div style="font-family:monospace;white-space:pre-wrap;border:1px solid black;padding:1em;">';
 		echo json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		echo '</div>';
 	}
@@ -694,7 +710,7 @@ function display_treemap($group = '')
 	// Debug display
 	if (1)
 	{
-		echo '<div style="font-family:monospace;white-space:pre-wrap;">';
+		echo '<div style="font-family:monospace;white-space:pre-wrap;border:1px solid black;padding:1em;">';
 		echo json_encode($tree_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		echo '</div>';
 	}

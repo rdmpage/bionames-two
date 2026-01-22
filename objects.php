@@ -162,7 +162,7 @@ function db_row_to_reference(
 					break;		
 					
 				case 'isbn':
-					switch ($obj->{'@type'})
+					switch ($obj->type)
 					{
 						case 'Chapter':
 							$obj->isPartOf = new stdclass;
@@ -527,6 +527,8 @@ function get_container_works_list($namespace, $id)
 			$sql .= ' WHERE issn="' . $id . '"';
 			break;
 	}
+	
+	$sql .= ' ORDER BY year';
 	
 	$data = db_get($sql);
 	
