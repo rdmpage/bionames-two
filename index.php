@@ -156,6 +156,7 @@ function display_entity_details($doc)
 	if ($main_entity->type == 'TaxonName')
 	{
 		echo '<div>';
+		echo '<div>';
 		echo '<span class="' . $main_entity->taxonRank . '">';
 		echo $main_entity->name;
 		echo '</span>';
@@ -165,8 +166,7 @@ function display_entity_details($doc)
 			echo $main_entity->author;
 		}
 		echo '</div>';
-	
-	
+		
 		if (isset($main_entity->higherClassification))
 		{
 			$breadcrumbs = array();
@@ -201,8 +201,8 @@ function display_entity_details($doc)
 				}
 			}
 			
-			$n = count($breadcrumbs);
-			
+			echo '<div>';
+			$n = count($breadcrumbs);			
 			for ($i = 0; $i < $n; $i++)
 			{
 				echo '<a href="' . $breadcrumbs[$i]->link . '">' . $breadcrumbs[$i]->label . '</a>';
@@ -216,6 +216,7 @@ function display_entity_details($doc)
 			{
 				echo '<div><img height="60" src="' . $image . '"></div>';
 			}
+			echo '</div>';
 		
 			
 		}
@@ -479,6 +480,18 @@ main {
 	overflow-wrap: break-word;
 }
 
+.genus {
+	font-style: italic;
+}
+.subgenus {
+	font-style: italic;
+}
+.species {
+	font-style: italic;
+}
+.subspecies {
+	font-style: italic;
+}
 .species {
 	font-style: italic;
 }
