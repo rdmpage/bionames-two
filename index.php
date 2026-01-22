@@ -694,22 +694,41 @@ function display_container_list($letter = '')
 function default_display($error_msg = '')
 {
 	global $config;
-	
+
 	$title = $config['site_name'];
-	
+
 	display_html_start($title);
 	display_navbar('');
-		
+	display_main_start();
+
 	if ($error_msg != '')
 	{
 		echo '<div><strong>Error!</strong> ' . $error_msg . '</div>';
 	}
 	else
 	{
-		// main content		
-		echo '<div>Default display</div>';
+		// Get database statistics
+		$stats = get_database_stats();
+
+		echo '<h1>Welcome to BioNames</h1>';
+
+		echo '<h2>Database Statistics</h2>';
+		echo '<dl>';
+		echo '<dt>Total names</dt>';
+		echo '<dd>' . number_format($stats->total_names) . '</dd>';
+
+		echo '<dt>Distinct name clusters</dt>';
+		echo '<dd>' . number_format($stats->total_clusters) . '</dd>';
+
+		echo '<dt>Names with DOIs</dt>';
+		echo '<dd>' . number_format($stats->names_with_dois) . '</dd>';
+
+		echo '<dt>Distinct journals</dt>';
+		echo '<dd>' . number_format($stats->distinct_journals) . '</dd>';
+		echo '</dl>';
 	}
 
+	display_main_end();
 	display_html_end();
 }
 

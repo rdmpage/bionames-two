@@ -960,6 +960,36 @@ if (0)
 }
 
 
+//----------------------------------------------------------------------------------------
+// Get database statistics for home page
+function get_database_stats()
+{
+	$stats = new stdclass;
+
+	// Total number of names
+	$sql = "SELECT COUNT(*) as count FROM names";
+	$data = db_get($sql);
+	$stats->total_names = $data[0]->count;
+
+	// Total number of distinct clusters
+	$sql = "SELECT COUNT(DISTINCT cluster_id) as count FROM names WHERE cluster_id IS NOT NULL";
+	$data = db_get($sql);
+	$stats->total_clusters = $data[0]->count;
+
+	// Number of names with DOIs
+	$sql = "SELECT COUNT(*) as count FROM names WHERE doi IS NOT NULL AND doi != ''";
+	$data = db_get($sql);
+	$stats->names_with_dois = $data[0]->count;
+
+	// Number of distinct journals
+	$sql = "SELECT COUNT(DISTINCT journal) as count FROM names WHERE journal IS NOT NULL AND journal != ''";
+	$data = db_get($sql);
+	$stats->distinct_journals = $data[0]->count;
+
+	return $stats;
+}
+
+
 if (0)
 {
 	$id = 4358279;
