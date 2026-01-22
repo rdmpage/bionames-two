@@ -201,8 +201,15 @@ function display_entity_details($doc)
 				}
 			}
 			
+			echo '<div style="display: flex; align-items: center; gap: 10px;">';
+
+			if ($image != '')
+			{
+				echo '<img height="60" src="' . $image . '">';
+			}
+
 			echo '<div>';
-			$n = count($breadcrumbs);			
+			$n = count($breadcrumbs);
 			for ($i = 0; $i < $n; $i++)
 			{
 				echo '<a href="' . $breadcrumbs[$i]->link . '">' . $breadcrumbs[$i]->label . '</a>';
@@ -211,11 +218,8 @@ function display_entity_details($doc)
 					echo ' / ';
 				}
 			}
-			
-			if ($image != '')
-			{
-				echo '<div><img height="60" src="' . $image . '"></div>';
-			}
+			echo '</div>';
+
 			echo '</div>';
 		
 			
