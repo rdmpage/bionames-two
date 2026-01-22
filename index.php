@@ -155,6 +155,18 @@ function display_entity_details($doc)
 	
 	if ($main_entity->type == 'TaxonName')
 	{
+		echo '<div>';
+		echo '<span class="' . $main_entity->taxonRank . '">';
+		echo $main_entity->name;
+		echo '</span>';
+		if (isset($main_entity->author))
+		{
+			echo '&nbsp;';
+			echo $main_entity->author;
+		}
+		echo '</div>';
+	
+	
 		if (isset($main_entity->higherClassification))
 		{
 			$breadcrumbs = array();
@@ -465,7 +477,23 @@ main {
 	white-space: pre-wrap;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
-}';
+}
+
+.species {
+	font-style: italic;
+}
+
+.subfamily {
+	font-variant: small-caps;
+}
+
+.family {
+	font-variant: small-caps;
+}
+
+
+
+';
 
 	echo '</style>' . "\n";	
 
