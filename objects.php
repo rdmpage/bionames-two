@@ -778,10 +778,21 @@ function search_names($query)
 
 	$feed->dataFeedElement = [];
 
-	// Escape query for SQL
-	$escaped_query = str_replace("'", "''", $query);
+	// Check for genus: prefix
+	if (preg_match('/^genus:(.+)$/i', $query, $matches))
+	{
+		// Search by genus name
+		$genus_name = trim($matches[1]);
+		$escaped_genus = str_replace("'", "''", $genus_name);
 
-	$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE nameComplete = '$escaped_query'";
+		$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE genusPart = '$escaped_genus'";
+	}
+	else
+	{
+		// Regular exact name search
+		$escaped_query = str_replace("'", "''", $query);
+		$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE nameComplete = '$escaped_query'";
+	}
 
 	$data = db_get($sql);
 
