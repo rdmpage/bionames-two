@@ -4,6 +4,10 @@ error_reporting(E_ALL);
 require_once (dirname(__FILE__) . '/config.inc.php');
 require_once (dirname(__FILE__) . '/core.php');
 
+require_once __DIR__ . '/vendor/autoload.php';
+
+use Seboettg\CiteProc\StyleSheet;
+use Seboettg\CiteProc\CiteProc;
 
 // for dev environment we do the job of .htaccess 
 if(preg_match('/^\/api.php/', $_SERVER["REQUEST_URI"])) return false;
@@ -232,6 +236,9 @@ function display_entity_details($doc)
 	{
 		$link_id = '';
 		$link_name = '[Unknown]';
+		
+		$csljson = '';
+		
 		if (is_string($main_entity->isBasedOn))
 		{
 			$link_id = $main_entity->isBasedOn;
@@ -246,6 +253,20 @@ function display_entity_details($doc)
 			{
 				$link_name = $main_entity->isBasedOn->name;
 			}
+			
+			// CSL-JSON
+			if (isset($main_entity->isBasedOn->encoding))
+			{
+				foreach ($main_entity->isBasedOn->encoding as $encoding)
+				{
+					if ($encoding->encodingFormat == 'application/vnd.citationstyles.csl+json')
+					{
+						$csljson = [json_decode($encoding->text)];
+						break;
+					}
+				}
+			}
+			
 		}
 		
 		if ($link_id != '')
@@ -255,7 +276,19 @@ function display_entity_details($doc)
 			echo '<div>';
 			echo '<h3>Based on</h3>';
 			echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
-			echo $link_name;
+			
+			if ($csljson != '')
+			{
+				$style_sheet = StyleSheet::loadStyleSheet('apa');
+				$citeProc = new CiteProc($style_sheet);
+				$out = $citeProc->render($csljson, "bibliography");
+				
+				echo $out;
+			}
+			else
+			{
+				echo $link_name;
+			}
 			echo '</a>';
 			echo '</div>';
 		}
@@ -389,7 +422,14 @@ function display_entity_details($doc)
 			{
 				if ($encoding->encodingFormat == 'application/pdf')
 				{
-					echo '<script>display_pdf("' . $encoding->contentUrl . '");</script>';
+					if (preg_match('/^hash:\/\/sha1/', $encoding->contentUrl, ))
+					{
+						echo '<script>display_pdf("http://localhost/content-store-cloud-client/' . $encoding->contentUrl . '");</script>';
+					}
+					else
+					{
+						// echo '<script>display_pdf("' . $encoding->contentUrl . '");</script>';
+					}
 				}
 			}
 		}

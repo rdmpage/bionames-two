@@ -242,24 +242,35 @@ function db_row_to_reference(
 		}
 	}
 	
-	if (!$embedded)
+	// CSL-JSON
+	$encoding = new stdclass;
+	$encoding->encodingFormat = 'application/vnd.citationstyles.csl+json';
+	$encoding->text = json_encode(get_reference_csl($row->sici));
+	
+	$obj->encoding = [];
+	$obj->encoding[] = $encoding;
+	
+	/*
+	// raw PDF URL
+	if (isset($row->pdf))
 	{
 		$encoding = new stdclass;
-		$encoding->encodingFormat = 'application/vnd.citationstyles.csl+json';
-		$encoding->text = json_encode(get_reference_csl($row->sici));
+		$encoding->encodingFormat = 'application/pdf';
+		$encoding->contentUrl = $row->pdf;
 		
-		$obj->encoding = [];
 		$obj->encoding[] = $encoding;
+	}
+	*/
+	
+	// Support for content hashing
+	if (isset($row->content_sha1))
+	{
+		$encoding = new stdclass;
+		$encoding->encodingFormat = 'application/pdf';
+		$encoding->contentUrl = 'hash://sha1/' . $row->content_sha1;
 		
-		if (isset($row->pdf))
-		{
-			$encoding = new stdclass;
-			$encoding->encodingFormat = 'application/pdf';
-			$encoding->contentUrl = $row->pdf;
-			
-			$obj->encoding[] = $encoding;
-		}
-	}	
+		$obj->encoding[] = $encoding;
+	}
 
 	return $obj;
 }
