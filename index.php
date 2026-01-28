@@ -161,9 +161,71 @@ function display_entity_details($doc)
 	{
 		echo '<div>';
 		echo '<div>';
+		
+		// show name in a way we make parts of it clickable 
+		
+		if (isset($main_entity->uninomial))
+		{		
+			if ($main_entity->taxonRank == 'genus')
+			{
+				echo '<span class="genericName">';
+				echo '<a href="?q=genus:' . $main_entity->uninomial . '">';
+				echo $main_entity->uninomial;
+				echo '</a>';	
+				echo '</span>';			
+			}
+			else
+			{
+				echo '<span class="' . $main_entity->taxonRank . '">';
+				echo $main_entity->uninomial;
+				echo '</span>';
+			}
+		}
+		else
+		{
+			// genusPart
+			echo '<span class="genericName">';
+			echo '<a href="?q=genus:' . $main_entity->genericName . '">';
+			echo $main_entity->genericName;
+			echo '</a>';	
+			echo '</span>';	
+			
+			// subgenus
+			if (isset($main_entity->infragenericEpithet))
+			{
+				echo ' ';
+				echo '<span class="infragenericEpithet">';
+				echo '(';
+				echo $main_entity->infragenericEpithet;
+				echo ')';
+				echo '</span>';
+			}
+
+
+			if (isset($main_entity->specificEpithet))
+			{
+				echo ' ';
+				echo '<span class="specificEpithet">';
+				echo $main_entity->specificEpithet;
+				echo '</span>';
+			}
+
+			if (isset($main_entity->infraspecificEpithet))
+			{
+				echo ' ';
+				echo '<span class="infraspecificEpithet">';
+				echo $main_entity->infraspecificEpithet;
+				echo '</span>';
+			}
+			
+		
+		}
+		
+		/*
 		echo '<span class="' . $main_entity->taxonRank . '">';
 		echo $main_entity->name;
 		echo '</span>';
+		*/
 		if (isset($main_entity->author))
 		{
 			echo '&nbsp;';
@@ -205,7 +267,7 @@ function display_entity_details($doc)
 				}
 			}
 			
-			echo '<div style="display: flex; align-items: center; gap: 10px;">';
+			echo '<div style="display: flex; align-items: center; gap: 10px;margin-top:1em;">';
 
 			if ($image != '')
 			{
@@ -524,19 +586,16 @@ main {
 	overflow-wrap: break-word;
 }
 
-.genus {
+.genericName {
 	font-style: italic;
 }
-.subgenus {
+.infragenericEpithet {
 	font-style: italic;
 }
-.species {
+.specificEpithet {
 	font-style: italic;
 }
-.subspecies {
-	font-style: italic;
-}
-.species {
+.infraspecificEpithet {
 	font-style: italic;
 }
 
@@ -547,8 +606,6 @@ main {
 .family {
 	font-variant: small-caps;
 }
-
-
 
 ';
 

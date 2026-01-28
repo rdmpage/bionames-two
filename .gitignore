@@ -3,3 +3,4 @@ bionames.db
 /images/
 /junk/
 /vendor/
+.phpunit.result.cache

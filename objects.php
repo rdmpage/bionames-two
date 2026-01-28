@@ -101,7 +101,11 @@ function add_taxon_context($context)
 	$context->infraspecificEpithet = 'dwc:infraspecificEpithet';
 	$context->scientificNameID     = 'dwc:scientificNameID';
 	$context->higherClassification = 'dwc:higherClassification';
-
+	
+	// TDWG LSID
+	$context->tn = 'http://rs.tdwg.org/ontology/voc/TaxonName#';
+	$context->uninomial = 'tn:uninomial';
+	
 	return $context;
 }
 
@@ -692,7 +696,7 @@ function get_name($id, $expand = true)
 
 	$data = db_get($sql);
 
-	$keys = ['id', 'nameComplete', 'taxonAuthor', 'rank', 'group',
+	$keys = ['id', 'cluster_id', 'nameComplete', 'taxonAuthor', 'rank', 'group',
 		'uninomial', 'genusPart', 'infragenericEpithet', 'specificEpithet', 'specificStem', 'infraspecificEpithet', 'infraspecificStem', 'publication', 'sici'];
 
 	foreach ($data as $row)
@@ -716,8 +720,13 @@ function get_name($id, $expand = true)
 						$obj->id = 'urn:lsid:organismnames.com:name:' . $row->{$k};
 
 						// $obj->scientificNameID = $obj->{'@id'};
-
-						$obj->sameAs = 'https://lsid.io/' .  $obj->id;
+						break;
+						
+					case 'cluster_id':
+						if ($row->{$k} != $row->id)
+						{
+							$obj->sameAs = 'urn:lsid:organismnames.com:name:' .  $row->cluster_id;
+						}
 						break;
 
 					case 'nameComplete':
@@ -737,6 +746,7 @@ function get_name($id, $expand = true)
 						$obj->genericName = $row->{$k};
 						break;
 
+					case 'uninomial':
 					case 'infragenericEpithet':
 					case 'specificEpithet':
 					case 'infraspecificEpithet':
@@ -815,6 +825,12 @@ function search_names($query)
 		$name = new stdclass;
 		$name->type = 'TaxonName';
 		$name->id = 'urn:lsid:organismnames.com:name:' . $row->id;
+		
+		if (isset($row->cluster_id) && $row->cluster_id != $row->id)
+		{
+			$name->sameAs = 'urn:lsid:organismnames.com:name:' .  $name->cluster_id;
+		}
+				
 		$name->name = $row->nameComplete;
 
 		if (isset($row->taxonAuthor))
