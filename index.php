@@ -137,9 +137,37 @@ function display_entity_details($doc)
 
 	if (isset($main_entity->oclc))
 	{
-		echo '<dt>OCLC</dt>';				
-		echo '<dd>' . external_identifier_link('oclc', $main_entity->oclc) . '</dd>';		
+		echo '<dt>OCLC</dt>';
+		echo '<dd>' . external_identifier_link('oclc', $main_entity->oclc) . '</dd>';
 	}
+
+	// sameAs - for TaxonName entities that are duplicates pointing to representative
+	if (isset($main_entity->sameAs))
+	{
+		echo '<dt>Same as</dt>';
+
+		// Handle both string and array cases
+		$sameAs_values = is_array($main_entity->sameAs) ? $main_entity->sameAs : [$main_entity->sameAs];
+
+		echo '<dd>';
+		$first = true;
+		foreach ($sameAs_values as $sameAs_id)
+		{
+			if (!$first)
+			{
+				echo '<br/>';
+			}
+			$first = false;
+
+			// Extract namespace and id from the sameAs identifier
+			$ns_id = id_to_key_value($sameAs_id);
+			echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+			echo htmlspecialchars($sameAs_id);
+			echo '</a>';
+		}
+		echo '</dd>';
+	}
+
 	echo '</dl>';
 	
 	
@@ -684,14 +712,68 @@ function display_search($q)
 	}
 	else
 	{
-		echo '<ul>';
+		// Cluster names by sameAs
+		$clusters = array();
+		$processed = array();
+
+		// First pass: identify representative names (those without sameAs)
 		foreach ($results->dataFeedElement as $dataFeedElement)
+		{
+			$item_id = '';
+			if (preg_match('/:name:(\d+)$/', $dataFeedElement->item->id, $m))
+			{
+				$item_id = $m[1];
+			}
+
+			if (!isset($dataFeedElement->item->sameAs))
+			{
+				// This is a representative name
+				$clusters[$dataFeedElement->item->id] = array(
+					'representative' => $dataFeedElement,
+					'duplicates' => array()
+				);
+				$processed[$dataFeedElement->item->id] = true;
+			}
+		}
+
+		// Second pass: assign duplicates to their clusters
+		foreach ($results->dataFeedElement as $dataFeedElement)
+		{
+			if (isset($dataFeedElement->item->sameAs))
+			{
+				$sameAs_id = is_array($dataFeedElement->item->sameAs)
+					? $dataFeedElement->item->sameAs[0]
+					: $dataFeedElement->item->sameAs;
+
+				if (isset($clusters[$sameAs_id]))
+				{
+					$clusters[$sameAs_id]['duplicates'][] = $dataFeedElement;
+					$processed[$dataFeedElement->item->id] = true;
+				}
+			}
+		}
+
+		// Third pass: handle any names not yet processed (edge cases)
+		foreach ($results->dataFeedElement as $dataFeedElement)
+		{
+			if (!isset($processed[$dataFeedElement->item->id]))
+			{
+				$clusters[$dataFeedElement->item->id] = array(
+					'representative' => $dataFeedElement,
+					'duplicates' => array()
+				);
+			}
+		}
+
+		// Display clusters
+		echo '<ul>';
+		foreach ($clusters as $cluster_id => $cluster)
 		{
 			echo '<li>';
 
-			// Extract numeric ID from LSID
+			// Display representative name
 			$item_id = '';
-			if (preg_match('/:name:(\d+)$/', $dataFeedElement->item->id, $m))
+			if (preg_match('/:name:(\d+)$/', $cluster['representative']->item->id, $m))
 			{
 				$item_id = $m[1];
 			}
@@ -701,16 +783,52 @@ function display_search($q)
 				echo '<a href="?namespace=names&id=' . $item_id . '">';
 			}
 
-			echo htmlspecialchars($dataFeedElement->item->name);
+			echo htmlspecialchars($cluster['representative']->item->name);
 
-			if (isset($dataFeedElement->item->author))
+			if (isset($cluster['representative']->item->author))
 			{
-				echo ' ' . htmlspecialchars($dataFeedElement->item->author);
+				echo ' ' . htmlspecialchars($cluster['representative']->item->author);
 			}
 
 			if ($item_id)
 			{
 				echo '</a>';
+			}
+
+			// Display duplicates if any
+			if (count($cluster['duplicates']) > 0)
+			{
+				echo '<ul>';
+				foreach ($cluster['duplicates'] as $duplicate)
+				{
+					echo '<li>';
+
+					$dup_id = '';
+					if (preg_match('/:name:(\d+)$/', $duplicate->item->id, $m))
+					{
+						$dup_id = $m[1];
+					}
+
+					if ($dup_id)
+					{
+						echo '<a href="?namespace=names&id=' . $dup_id . '">';
+					}
+
+					echo htmlspecialchars($duplicate->item->name);
+
+					if (isset($duplicate->item->author))
+					{
+						echo ' ' . htmlspecialchars($duplicate->item->author);
+					}
+
+					if ($dup_id)
+					{
+						echo '</a>';
+					}
+
+					echo '</li>';
+				}
+				echo '</ul>';
 			}
 
 			echo '</li>';
