@@ -359,6 +359,63 @@ function display_entity_details($doc)
 			echo '</div>';
 		}
 
+		// Display higher classification (same as for TaxonName)
+		if (isset($main_entity->higherClassification))
+		{
+			$breadcrumbs = array();
+
+			$parts = explode(';', $main_entity->higherClassification);
+
+			$image = '';
+			$link = '';
+			foreach ($parts as $part)
+			{
+				$breadcrumb = new stdclass;
+
+				if ($link == '')
+				{
+					$link = $part;
+				}
+				else
+				{
+					$link = $link . ';' . $part;
+				}
+				$breadcrumb->link = $link;
+				$breadcrumb->label = preg_replace('/^\w+__/', '', $part);
+				$breadcrumbs[] = $breadcrumb;
+
+				$extension = 'png';
+				$extension = 'svg';
+
+				$image_filename = dirname(__FILE__) . '/images/' . $breadcrumb->label . '.' . $extension;
+				if (file_exists($image_filename))
+				{
+					$image = 'images/' . $breadcrumb->label . '.' . $extension;
+				}
+			}
+
+			echo '<div style="display: flex; align-items: center; gap: 10px;margin-top:1em;">';
+
+			if ($image != '')
+			{
+				echo '<img height="60" src="' . $image . '">';
+			}
+
+			echo '<div>';
+			$n = count($breadcrumbs);
+			for ($i = 0; $i < $n; $i++)
+			{
+				echo '<a href="?path=' . urlencode($breadcrumbs[$i]->link) . '">' . $breadcrumbs[$i]->label . '</a>';
+				if ($i < $n - 1)
+				{
+					echo ' / ';
+				}
+			}
+			echo '</div>';
+
+			echo '</div>';
+		}
+
 		if (isset($main_entity->scientificName) && count($main_entity->scientificName) > 0)
 		{
 			echo '<h2>Scientific Names</h2>';
@@ -367,23 +424,25 @@ function display_entity_details($doc)
 			{
 				echo '<li>';
 
-				// Extract numeric ID from the name URI
-				$name_id = '';
-				if (preg_match('/\/names\/(\d+)$/', $scientificName->id, $m))
-				{
-					$name_id = $m[1];
-				}
+				// Use id_to_key_value to extract namespace and id
+				$ns_id = id_to_key_value($scientificName->id);
 
-				if ($name_id)
+				if ($ns_id[0] && $ns_id[1])
 				{
-					echo '<a href="?namespace=names&id=' . $name_id . '">';
+					echo '<a href="?namespace=' . $ns_id[0] . '&id=' . $ns_id[1] . '">';
 				}
 
 				echo htmlspecialchars($scientificName->name);
 
-				if ($name_id)
+				if ($ns_id[0] && $ns_id[1])
 				{
 					echo '</a>';
+				}
+
+				// Display author if available
+				if (isset($scientificName->author))
+				{
+					echo ' ' . htmlspecialchars($scientificName->author);
 				}
 
 				echo '</li>';

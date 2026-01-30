@@ -901,8 +901,8 @@ if (0)
 function get_cluster($cluster_id)
 {
 	// Get the representative name (the one where id = cluster_id)
-	$sql = "SELECT id, nameComplete, rank FROM names WHERE id = '$cluster_id' LIMIT 1";
-	
+	$sql = "SELECT id, nameComplete, rank, `group` FROM names WHERE id = '$cluster_id' LIMIT 1";
+
 	$data = db_get($sql);
 
 	if (count($data) == 0)
@@ -924,16 +924,28 @@ function get_cluster($cluster_id)
 		$obj->taxonRank = $representative->rank;
 	}
 
+	// Add higherClassification from representative name
+	if (isset($representative->group))
+	{
+		$obj->higherClassification = $representative->group;
+	}
+
 	// Get all names for this cluster_id
-	$sql = "SELECT id, nameComplete FROM names WHERE cluster_id = '$cluster_id'";
+	$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE cluster_id = '$cluster_id'";
 	$data = db_get($sql);
 
 	$obj->scientificName = array();
 	foreach ($data as $row)
 	{
 		$name = new stdclass;
-		$name->id = 'https://bionames.org/names/' . $row->id;
+		$name->id = 'urn:lsid:organismnames.com:name:' . $row->id;
 		$name->name = $row->nameComplete;
+
+		if (isset($row->taxonAuthor))
+		{
+			$name->author = $row->taxonAuthor;
+		}
+
 		$obj->scientificName[] = $name;
 	}
 
