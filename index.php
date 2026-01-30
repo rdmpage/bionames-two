@@ -935,12 +935,6 @@ function display_container_list($letter = '')
 }
 
 //----------------------------------------------------------------------------------------
-function display_cluster($cluster_id)
-{
-
-}
-
-//----------------------------------------------------------------------------------------
 // Home page, or badness happened
 function default_display($error_msg = '')
 {
@@ -1014,16 +1008,7 @@ function main()
 		display_entity($namespace, $id);
 		exit(0);
 	}
-	
-	// Show cluster of entities
-	if (isset($_GET['cluster']))
-	{	
-		$cluster_id = $_GET['cluster'];						
-		
-		display_cluster($cluster_id);
-		exit(0);
-	}
-		
+			
 	// Show search
 	if (isset($_GET['q']))
 	{	
