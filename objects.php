@@ -901,7 +901,8 @@ if (0)
 function get_cluster($cluster_id)
 {
 	// Get the representative name (the one where id = cluster_id)
-	$sql = "SELECT id, nameComplete, taxonRank FROM names WHERE id = '$cluster_id' LIMIT 1";
+	$sql = "SELECT id, nameComplete, rank FROM names WHERE id = '$cluster_id' LIMIT 1";
+	
 	$data = db_get($sql);
 
 	if (count($data) == 0)
@@ -918,9 +919,9 @@ function get_cluster($cluster_id)
 	$obj->id = 'https://bionames.org/cluster/' . $cluster_id;
 	$obj->name = $representative->nameComplete;
 
-	if (isset($representative->taxonRank))
+	if (isset($representative->rank))
 	{
-		$obj->taxonRank = $representative->taxonRank;
+		$obj->taxonRank = $representative->rank;
 	}
 
 	// Get all names for this cluster_id
