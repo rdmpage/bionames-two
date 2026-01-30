@@ -348,9 +348,52 @@ function display_entity_details($doc)
 			echo '</div>';
 		}
 	}
-	
-	
-	// specific 
+
+	// Taxon type - display scientific names in cluster
+	if ($main_entity->type == 'Taxon')
+	{
+		if (isset($main_entity->taxonRank))
+		{
+			echo '<div>';
+			echo '<strong>Rank:</strong> ' . htmlspecialchars($main_entity->taxonRank);
+			echo '</div>';
+		}
+
+		if (isset($main_entity->scientificName) && count($main_entity->scientificName) > 0)
+		{
+			echo '<h2>Scientific Names</h2>';
+			echo '<ul>';
+			foreach ($main_entity->scientificName as $scientificName)
+			{
+				echo '<li>';
+
+				// Extract numeric ID from the name URI
+				$name_id = '';
+				if (preg_match('/\/names\/(\d+)$/', $scientificName->id, $m))
+				{
+					$name_id = $m[1];
+				}
+
+				if ($name_id)
+				{
+					echo '<a href="?namespace=names&id=' . $name_id . '">';
+				}
+
+				echo htmlspecialchars($scientificName->name);
+
+				if ($name_id)
+				{
+					echo '</a>';
+				}
+
+				echo '</li>';
+			}
+			echo '</ul>';
+		}
+	}
+
+
+	// specific
 	if (isset($main_entity->isBasedOn))
 	{
 		$link_id = '';

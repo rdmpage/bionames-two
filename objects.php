@@ -897,6 +897,49 @@ if (0)
 
 
 //----------------------------------------------------------------------------------------
+// Get cluster (taxon) - all names that share the same cluster_id
+function get_cluster($cluster_id)
+{
+	// Get the representative name (the one where id = cluster_id)
+	$sql = "SELECT id, nameComplete, taxonRank FROM names WHERE id = '$cluster_id' LIMIT 1";
+	$data = db_get($sql);
+
+	if (count($data) == 0)
+	{
+		return null;
+	}
+
+	$representative = $data[0];
+
+	// Create the Taxon entity
+	$obj = new stdclass;
+	$obj->{'@context'} = create_context();
+	$obj->type = 'Taxon';
+	$obj->id = 'https://bionames.org/cluster/' . $cluster_id;
+	$obj->name = $representative->nameComplete;
+
+	if (isset($representative->taxonRank))
+	{
+		$obj->taxonRank = $representative->taxonRank;
+	}
+
+	// Get all names for this cluster_id
+	$sql = "SELECT id, nameComplete FROM names WHERE cluster_id = '$cluster_id'";
+	$data = db_get($sql);
+
+	$obj->scientificName = array();
+	foreach ($data as $row)
+	{
+		$name = new stdclass;
+		$name->id = 'https://bionames.org/names/' . $row->id;
+		$name->name = $row->nameComplete;
+		$obj->scientificName[] = $name;
+	}
+
+	return $obj;
+}
+
+//----------------------------------------------------------------------------------------
 // Get database statistics for home page
 function get_database_stats()
 {

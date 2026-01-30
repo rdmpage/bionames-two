@@ -111,37 +111,42 @@ function get_entity($namespace, $id)
 	
 	switch ($namespace)
 	{
+		case 'cluster':
+			$doc = get_cluster($id);
+			$entity[] = $doc;
+			break;
+
 		case 'doi':
 			$sici = get_reference_id_from_doi($id);
 			$entity = get_entity('references', $sici);
 			break;
-	
+
 		case 'issn':
 		case 'oclc':
 			$doc = get_container($namespace, $id);
 			$entity[] = $doc;
-			
+
 			$doc = get_container_works_list($namespace, $id);
 			$entity[] = $doc;
 			break;
-			
-		case 'names':			
+
+		case 'names':
 			$doc = get_name($id);
 			$entity[] = $doc;
-			break;	
-			
+			break;
+
 		case 'references':
 			$doc = get_reference($id);
 			$entity[] = $doc;
 
 			$doc = get_names_in_reference($id);
 			$entity[] = $doc;
-			break;			
+			break;
 
 		default:
 			$entity[] = null;
 			break;
-	
+
 	}
 	
 	return $entity;
