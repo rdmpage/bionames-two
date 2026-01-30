@@ -303,7 +303,8 @@ function get_reference_id_from_doi($doi)
 {
 	$id = '';
 	
-	$sql = "SELECT * FROM names WHERE doi='$doi' LIMIT 1";
+	// like because we are doing a case insensitive search and LIKE is fatser than =
+	$sql = "SELECT * FROM names WHERE doi LIKE '$doi' LIMIT 1";
 	
 	$data = db_get($sql);
 	
