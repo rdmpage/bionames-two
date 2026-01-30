@@ -32,7 +32,8 @@ function external_identifier_link($namespace, $value)
 			break;
 			
 		case 'lsid':
-			$html = '<a href="https://lsid.io/' . $value . '" target="_new">' . $value . '</a>';			
+			//$html = '<a href="https://lsid.io/' . $value . '" target="_new">' . $value . '</a>';			
+			$html = '<a href="http://www.organismnames.com/details.htm?lsid=' . str_replace('urn:lsid:organismnames.com:name:', '', $value) . '" target="_new">' . $value . '</a>';			
 			break;
 
 		case 'oclc':
@@ -97,9 +98,24 @@ function id_to_key_value($id)
 		$kv = [$m[1], $m[2]];
 	}
 	
-	if (preg_match('/.org\/(.*)\/(.*)$/', $id, $m))
+	if (preg_match('/(oclc)\/(\d+)$/', $id, $m))
 	{
 		$kv = [$m[1], $m[2]];
+	}
+	
+	if (preg_match('/(doi).org\/(10.*)$/', $id, $m))
+	{
+		$kv = [$m[1], $m[2]];
+	}
+	
+	if (preg_match('/(references)\/([0-9a-z]+)$/', $id, $m))
+	{
+		$kv = [$m[1], $m[2]];
+	}	
+		
+	if (preg_match('/urn:lsid:organismnames.com:name:(\d+)$/', $id, $m))
+	{
+		$kv = ['names', $m[1]];
 	}
 
 	return $kv;
@@ -194,66 +210,81 @@ function display_entity_details($doc)
 		
 		if (isset($main_entity->uninomial))
 		{		
-			if ($main_entity->taxonRank == 'genus')
+			if (isset($main_entity->taxonRank))
 			{
-				echo '<span class="genericName">';
-				echo '<a href="?q=genus:' . $main_entity->uninomial . '">';
-				echo $main_entity->uninomial;
-				echo '</a>';	
-				echo '</span>';			
+				if ($main_entity->taxonRank == 'genus')
+				{
+					echo '<span class="genericName">';
+					echo '<a href="?q=genus:' . $main_entity->uninomial . '">';
+					echo $main_entity->uninomial;
+					echo '</a>';	
+					echo '</span>';			
+				}
+				else
+				{
+					echo '<span class="' . $main_entity->taxonRank . '">';
+					echo $main_entity->uninomial;
+					echo '</span>';
+				}
 			}
 			else
 			{
-				echo '<span class="' . $main_entity->taxonRank . '">';
+				// shouldn't happen but see e.g. Cangshanaltica
+				echo '<span class="unranked">';
 				echo $main_entity->uninomial;
-				echo '</span>';
+				echo '</span>';				
 			}
 		}
 		else
 		{
-			// genusPart
-			echo '<span class="genericName">';
-			echo '<a href="?q=genus:' . $main_entity->genericName . '">';
-			echo $main_entity->genericName;
-			echo '</a>';	
-			echo '</span>';	
-			
-			// subgenus
-			if (isset($main_entity->infragenericEpithet))
+			if (isset($main_entity->genericName))
 			{
-				echo ' ';
-				echo '<span class="infragenericEpithet">';
-				echo '(';
-				echo $main_entity->infragenericEpithet;
-				echo ')';
-				echo '</span>';
+				// genusPart
+				echo '<span class="genericName">';
+				echo '<a href="?q=genus:' . $main_entity->genericName . '">';
+				echo $main_entity->genericName;
+				echo '</a>';	
+				echo '</span>';	
+				
+				// subgenus
+				if (isset($main_entity->infragenericEpithet))
+				{
+					echo ' ';
+					echo '<span class="infragenericEpithet">';
+					echo '(';
+					echo $main_entity->infragenericEpithet;
+					echo ')';
+					echo '</span>';
+				}
+	
+	
+				if (isset($main_entity->specificEpithet))
+				{
+					echo ' ';
+					echo '<span class="specificEpithet">';
+					echo $main_entity->specificEpithet;
+					echo '</span>';
+				}
+	
+				if (isset($main_entity->infraspecificEpithet))
+				{
+					echo ' ';
+					echo '<span class="infraspecificEpithet">';
+					echo $main_entity->infraspecificEpithet;
+					echo '</span>';
+				}
 			}
-
-
-			if (isset($main_entity->specificEpithet))
+			else
 			{
-				echo ' ';
-				echo '<span class="specificEpithet">';
-				echo $main_entity->specificEpithet;
-				echo '</span>';
-			}
-
-			if (isset($main_entity->infraspecificEpithet))
-			{
-				echo ' ';
-				echo '<span class="infraspecificEpithet">';
-				echo $main_entity->infraspecificEpithet;
-				echo '</span>';
+				// shouldn't happen, but name might not be parsed
+				echo '<span>';
+				echo $main_entity->name;
+				echo '</span>';			
 			}
 			
 		
 		}
 		
-		/*
-		echo '<span class="' . $main_entity->taxonRank . '">';
-		echo $main_entity->name;
-		echo '</span>';
-		*/
 		if (isset($main_entity->author))
 		{
 			echo '&nbsp;';
@@ -306,7 +337,7 @@ function display_entity_details($doc)
 			$n = count($breadcrumbs);
 			for ($i = 0; $i < $n; $i++)
 			{
-				echo '<a href="' . $breadcrumbs[$i]->link . '">' . $breadcrumbs[$i]->label . '</a>';
+				echo '<a href="?path=' . urlencode($breadcrumbs[$i]->link) . '">' . $breadcrumbs[$i]->label . '</a>';
 				if ($i < $n - 1)
 				{
 					echo ' / ';
@@ -315,8 +346,6 @@ function display_entity_details($doc)
 			echo '</div>';
 
 			echo '</div>';
-		
-			
 		}
 	}
 	
@@ -614,6 +643,12 @@ main {
 	overflow-wrap: break-word;
 }
 
+.family {
+	font-variant: small-caps;
+}
+.subfamily {
+	font-variant: small-caps;
+}
 .genericName {
 	font-style: italic;
 }
@@ -626,13 +661,8 @@ main {
 .infraspecificEpithet {
 	font-style: italic;
 }
-
-.subfamily {
-	font-variant: small-caps;
-}
-
-.family {
-	font-variant: small-caps;
+.unranked {
+	background-color:orange;
 }
 
 ';
@@ -692,6 +722,7 @@ function display_main_end()
 }
 
 //----------------------------------------------------------------------------------------
+// Search for names, cluster results by cluster_id
 function display_search($q)
 {
 	global $config;
@@ -903,6 +934,11 @@ function display_container_list($letter = '')
 	display_html_end();
 }
 
+//----------------------------------------------------------------------------------------
+function display_cluster($cluster_id)
+{
+
+}
 
 //----------------------------------------------------------------------------------------
 // Home page, or badness happened
@@ -979,6 +1015,14 @@ function main()
 		exit(0);
 	}
 	
+	// Show cluster of entities
+	if (isset($_GET['cluster']))
+	{	
+		$cluster_id = $_GET['cluster'];						
+		
+		display_cluster($cluster_id);
+		exit(0);
+	}
 		
 	// Show search
 	if (isset($_GET['q']))
@@ -1001,71 +1045,39 @@ function main()
 		exit(0);
 	}
 	
-	// Taxonomy browser (treemap)
-	if (isset($_GET['treemap']))
+	// Taxonomy browser
+	if (isset($_GET['path']))
 	{
-		$group = '';
-		if (isset($_GET['group']))
-		{
-			$group = $_GET['group'];
-		}
-
-		display_treemap($group);
+		$path = $_GET['path'];
+		display_path($path);
 		exit(0);
 	}
 
 }
 
+
 //----------------------------------------------------------------------------------------
-function display_treemap($group = '')
+function display_path($path)
 {
-	global $config;
-
-	$tree_data = get_taxonomy_tree($group);
-
-	$title = $group == '' ? 'Taxonomic Browser' : 'Taxonomy: ' . $group;
+	$title = join(" ", explode(";", $path));
 
 	display_html_start($title);
 	display_navbar('');
 	display_main_start();
 
 	echo '<h1>' . htmlspecialchars($title) . '</h1>';
-
-	// Breadcrumb navigation
-	if ($group != '')
-	{
-		$parts = explode(';', $group);
-		echo '<div class="breadcrumb">';
-		echo '<a href="?treemap">All</a>';
-
-		$path = '';
-		foreach ($parts as $part)
-		{
-			$path .= ($path == '' ? '' : ';') . $part;
-			echo ' &gt; <a href="?treemap&group=' . urlencode($path) . '">' . htmlspecialchars($part) . '</a>';
-		}
-		echo '</div>';
-	}
-
-	// Container for treemap
-	echo '<div id="treemap" style="width:100%; height:600px;"></div>';
-
-	// Embed the tree data as JSON
-	echo '<script>';
-	echo 'var treeData = ' . json_encode($tree_data) . ';';
-	echo '</script>';
-
-	// Debug display
-	if (1)
-	{
-		echo '<div style="font-family:monospace;white-space:pre-wrap;border:1px solid black;padding:1em;">';
-		echo json_encode($tree_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
-		echo '</div>';
-	}
+	
+	/*
+	$doc = get_names_in_group($path);
+	print_r($doc);
+	*/
 
 	display_main_end();
 	display_html_end();
+
 }
+
+
 
 main();
 

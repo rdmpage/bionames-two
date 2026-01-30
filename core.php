@@ -111,6 +111,11 @@ function get_entity($namespace, $id)
 	
 	switch ($namespace)
 	{
+		case 'doi':
+			$sici = get_reference_id_from_doi($id);
+			$entity = get_entity('references', $sici);
+			break;
+	
 		case 'issn':
 		case 'oclc':
 			$doc = get_container($namespace, $id);
@@ -134,6 +139,7 @@ function get_entity($namespace, $id)
 			break;			
 
 		default:
+			$entity[] = null;
 			break;
 	
 	}

@@ -298,6 +298,24 @@ function get_reference($id, $embedded = false)
 }
 
 //----------------------------------------------------------------------------------------
+// get schema.org style reference from its id
+function get_reference_id_from_doi($doi)
+{
+	$id = '';
+	
+	$sql = "SELECT * FROM names WHERE doi='$doi' LIMIT 1";
+	
+	$data = db_get($sql);
+	
+	if ($data && isset($data[0]))
+	{
+		$id = $data[0]->sici;
+	}
+
+	return $id;
+}
+
+//----------------------------------------------------------------------------------------
 // Get reference in CSL JSON
 function get_reference_csl($id)
 {
@@ -806,13 +824,13 @@ function search_names($query)
 		$genus_name = trim($matches[1]);
 		$escaped_genus = str_replace("'", "''", $genus_name);
 
-		$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE genusPart = '$escaped_genus' ORDER BY nameComplete";
+		$sql = "SELECT id, cluster_id, nameComplete, taxonAuthor FROM names WHERE genusPart = '$escaped_genus' ORDER BY nameComplete";
 	}
 	else
 	{
 		// Regular exact name search
 		$escaped_query = str_replace("'", "''", $query);
-		$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE nameComplete = '$escaped_query' ORDER BY nameComplete";
+		$sql = "SELECT id, cluster_id, nameComplete, taxonAuthor FROM names WHERE nameComplete = '$escaped_query' ORDER BY nameComplete";
 	}
 
 	$data = db_get($sql);
@@ -828,7 +846,7 @@ function search_names($query)
 		
 		if (isset($row->cluster_id) && $row->cluster_id != $row->id)
 		{
-			$name->sameAs = 'urn:lsid:organismnames.com:name:' .  $name->cluster_id;
+			$name->sameAs = 'urn:lsid:organismnames.com:name:' .  $row->cluster_id;
 		}
 				
 		$name->name = $row->nameComplete;
@@ -845,116 +863,7 @@ function search_names($query)
 	return $feed;
 }
 
-//----------------------------------------------------------------------------------------
-// Get taxonomic hierarchy for treemap visualization
-// Returns hierarchical structure with counts for each taxon
-function get_taxonomy_tree($parent_path = '')
-{
-	$sql = "SELECT DISTINCT `group` FROM names WHERE `group` IS NOT NULL";
 
-	if ($parent_path != '')
-	{
-		$escaped_path = str_replace("'", "''", $parent_path);
-		$sql .= " AND `group` LIKE '$escaped_path%'";
-	}
-
-	$data = db_get($sql);
-
-	// Build hierarchy
-	$tree = new stdclass;
-	$tree->name = $parent_path == '' ? 'Life' : $parent_path;
-	$tree->children = [];
-
-	$groups = [];
-
-	foreach ($data as $row)
-	{
-		if (isset($row->group))
-		{
-			$lineage = explode(';', $row->group);
-
-			// Find the next level down from parent
-			$depth = $parent_path == '' ? 0 : count(explode(';', $parent_path));
-
-			if (isset($lineage[$depth]))
-			{
-				$taxon = $lineage[$depth];
-
-				if (!isset($groups[$taxon]))
-				{
-					$groups[$taxon] = 0;
-				}
-				$groups[$taxon]++;
-			}
-		}
-	}
-
-	// Convert to tree structure
-	foreach ($groups as $taxon => $count)
-	{
-		$child = new stdclass;
-		$child->name = $taxon;
-		$child->value = $count;
-
-		// Build full path for this taxon
-		if ($parent_path == '')
-		{
-			$child->path = $taxon;
-		}
-		else
-		{
-			$child->path = $parent_path . ';' . $taxon;
-		}
-
-		$tree->children[] = $child;
-	}
-
-	return $tree;
-}
-
-//----------------------------------------------------------------------------------------
-// Get names within a specific taxonomic group
-function get_names_in_group($group_path)
-{
-	$feed = new stdclass;
-	$feed->{'@context'} = create_context();
-	$feed->{'@context'} = add_taxon_context($feed->{'@context'});
-	$feed->type = 'DataFeed';
-	$feed->name = 'Names in ' . $group_path;
-
-	$feed->dataFeedElement = [];
-
-	$escaped_path = str_replace("'", "''", $group_path);
-	$sql = "SELECT id, nameComplete, taxonAuthor, rank FROM names WHERE `group` LIKE '$escaped_path%' LIMIT 100";
-
-	$data = db_get($sql);
-
-	foreach ($data as $row)
-	{
-		$item = new stdclass;
-		$item->type = 'DataFeedItem';
-
-		$name = new stdclass;
-		$name->type = 'TaxonName';
-		$name->id = 'urn:lsid:organismnames.com:name:' . $row->id;
-		$name->name = $row->nameComplete;
-
-		if (isset($row->taxonAuthor))
-		{
-			$name->author = $row->taxonAuthor;
-		}
-
-		if (isset($row->rank))
-		{
-			$name->taxonRank = $row->rank;
-		}
-
-		$item->item = $name;
-		$feed->dataFeedElement[] = $item;
-	}
-
-	return $feed;
-}
 
 if (0)
 {
