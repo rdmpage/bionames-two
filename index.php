@@ -122,6 +122,74 @@ function id_to_key_value($id)
 }
 
 //----------------------------------------------------------------------------------------
+function classification_label($higherClassification)
+{
+	$parts = explode(';', $higherClassification);
+	$label = array_pop($parts);
+	$label = preg_replace('/^\w+__/', '', $label);
+	
+	return $label;
+}
+
+
+//----------------------------------------------------------------------------------------
+function display_classification_breadcrumbs($higherClassification)
+{
+	$breadcrumbs = array();
+
+	$parts = explode(';', $higherClassification);
+	
+	$image = '';
+	$link = '';			
+	foreach ($parts as $part)
+	{
+		$breadcrumb = new stdclass;
+		
+		if ($link == '')
+		{
+			$link = $part;
+		}
+		else
+		{
+			$link = $link . ';' . $part;
+		}
+		$breadcrumb->link = $link;
+		$breadcrumb->label = preg_replace('/^\w+__/', '', $part);
+		$breadcrumbs[] = $breadcrumb;
+		
+		$extension = 'png';
+		$extension = 'svg';
+		
+		$image_filename = dirname(__FILE__) . '/images/' . $breadcrumb->label . '.' . $extension;
+		if (file_exists($image_filename))
+		{
+			$image = 'images/' . $breadcrumb->label . '.' . $extension;
+		}
+	}
+	
+	echo '<div style="display: flex; align-items: center; gap: 10px;margin-top:1em;">';
+
+	if ($image != '')
+	{
+		echo '<img height="60" src="' . $image . '">';
+	}
+
+	echo '<div>';
+	$n = count($breadcrumbs);
+	for ($i = 0; $i < $n; $i++)
+	{
+		echo '<a href="?path=' . urlencode($breadcrumbs[$i]->link) . '">' . $breadcrumbs[$i]->label . '</a>';
+		if ($i < $n - 1)
+		{
+			echo ' / ';
+		}
+	}
+	echo '</div>';
+
+	echo '</div>';
+}
+
+//----------------------------------------------------------------------------------------
 function display_entity_details($doc)
 {	
 	// Any entity
@@ -294,58 +362,7 @@ function display_entity_details($doc)
 		
 		if (isset($main_entity->higherClassification))
 		{
-			$breadcrumbs = array();
-
-			$parts = explode(';', $main_entity->higherClassification);
-			
-			$image = '';
-			$link = '';			
-			foreach ($parts as $part)
-			{
-				$breadcrumb = new stdclass;
-				
-				if ($link == '')
-				{
-					$link = $part;
-				}
-				else
-				{
-					$link = $link . ';' . $part;
-				}
-				$breadcrumb->link = $link;
-				$breadcrumb->label = preg_replace('/^\w+__/', '', $part);
-				$breadcrumbs[] = $breadcrumb;
-				
-				$extension = 'png';
-				$extension = 'svg';
-				
-				$image_filename = dirname(__FILE__) . '/images/' . $breadcrumb->label . '.' . $extension;
-				if (file_exists($image_filename))
-				{
-					$image = 'images/' . $breadcrumb->label . '.' . $extension;
-				}
-			}
-			
-			echo '<div style="display: flex; align-items: center; gap: 10px;margin-top:1em;">';
-
-			if ($image != '')
-			{
-				echo '<img height="60" src="' . $image . '">';
-			}
-
-			echo '<div>';
-			$n = count($breadcrumbs);
-			for ($i = 0; $i < $n; $i++)
-			{
-				echo '<a href="?path=' . urlencode($breadcrumbs[$i]->link) . '">' . $breadcrumbs[$i]->label . '</a>';
-				if ($i < $n - 1)
-				{
-					echo ' / ';
-				}
-			}
-			echo '</div>';
-
-			echo '</div>';
+			display_classification_breadcrumbs($main_entity->higherClassification);
 		}
 	}
 
@@ -362,58 +379,7 @@ function display_entity_details($doc)
 		// Display higher classification (same as for TaxonName)
 		if (isset($main_entity->higherClassification))
 		{
-			$breadcrumbs = array();
-
-			$parts = explode(';', $main_entity->higherClassification);
-
-			$image = '';
-			$link = '';
-			foreach ($parts as $part)
-			{
-				$breadcrumb = new stdclass;
-
-				if ($link == '')
-				{
-					$link = $part;
-				}
-				else
-				{
-					$link = $link . ';' . $part;
-				}
-				$breadcrumb->link = $link;
-				$breadcrumb->label = preg_replace('/^\w+__/', '', $part);
-				$breadcrumbs[] = $breadcrumb;
-
-				$extension = 'png';
-				$extension = 'svg';
-
-				$image_filename = dirname(__FILE__) . '/images/' . $breadcrumb->label . '.' . $extension;
-				if (file_exists($image_filename))
-				{
-					$image = 'images/' . $breadcrumb->label . '.' . $extension;
-				}
-			}
-
-			echo '<div style="display: flex; align-items: center; gap: 10px;margin-top:1em;">';
-
-			if ($image != '')
-			{
-				echo '<img height="60" src="' . $image . '">';
-			}
-
-			echo '<div>';
-			$n = count($breadcrumbs);
-			for ($i = 0; $i < $n; $i++)
-			{
-				echo '<a href="?path=' . urlencode($breadcrumbs[$i]->link) . '">' . $breadcrumbs[$i]->label . '</a>';
-				if ($i < $n - 1)
-				{
-					echo ' / ';
-				}
-			}
-			echo '</div>';
-
-			echo '</div>';
+			display_classification_breadcrumbs($main_entity->higherClassification);
 		}
 
 		if (isset($main_entity->scientificName) && count($main_entity->scientificName) > 0)
@@ -767,6 +733,37 @@ main {
 	background-color:orange;
 }
 
+#treemap {
+  --w: ' . $config['treemap_width'] . ';
+  --h: ' . $config['treemap_height'] . ';
+
+  position: relative;
+  width: 100%;
+  aspect-ratio: calc(var(--w) / var(--h));
+}
+
+/* cell in treemap */
+.cell {
+	background-color: #eeeeee;
+	border:1px solid rgb(200,200,200);
+	opacity:0.5;
+	position:absolute;
+	overflow:hidden;
+	text-align:center;
+}
+    
+.cell:hover {
+    border:1px solid rgb(192,192,192);
+    opacity:1.0;
+}
+
+.cell a {
+	text-decoration: none;
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
 ';
 
 	echo '</style>' . "\n";	
@@ -1076,6 +1073,30 @@ function default_display($error_msg = '')
 	display_html_end();
 }
 
+
+//----------------------------------------------------------------------------------------
+function display_path($path)
+{
+	$title = classification_label($path);
+
+	display_html_start($title);
+	display_navbar('');
+	display_main_start();
+
+	echo '<h1>' . htmlspecialchars($title) . '</h1>';
+	
+	display_classification_breadcrumbs($path);	
+	
+	echo '<div id="treemap"></div>';
+	
+	echo '<script>
+	drawTreemap("' . $path . '");	
+	</script>';
+
+	display_main_end();
+	display_html_end();
+}
+
 //----------------------------------------------------------------------------------------
 function main()
 {
@@ -1141,30 +1162,6 @@ function main()
 	}
 
 }
-
-
-//----------------------------------------------------------------------------------------
-function display_path($path)
-{
-	$title = join(" ", explode(";", $path));
-
-	display_html_start($title);
-	display_navbar('');
-	display_main_start();
-
-	echo '<h1>' . htmlspecialchars($title) . '</h1>';
-	
-	/*
-	$doc = get_names_in_group($path);
-	print_r($doc);
-	*/
-
-	display_main_end();
-	display_html_end();
-
-}
-
-
 
 main();
 

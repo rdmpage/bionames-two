@@ -91,7 +91,13 @@ function add_taxon_context($context)
 	$isBasedOn->{'@id'} = 'isBasedOn';
 	$isBasedOn->{'@type'} = '@id';
 	$context->isBasedOn = $isBasedOn;		
-
+	
+	// parentTaxon
+	$parentTaxon = new stdclass;
+	$parentTaxon->{'@id'} = 'parentTaxon';
+	$parentTaxon->{'@type'} = '@id';
+	$context->parentTaxon = $parentTaxon;		
+	
 	// DarwinCore
 	$context->dwc = 'http://rs.tdwg.org/dwc/terms/';
 	
@@ -916,6 +922,8 @@ function get_cluster($cluster_id)
 	// Create the Taxon entity
 	$obj = new stdclass;
 	$obj->{'@context'} = create_context();
+	$obj->{'@context'} = add_taxon_context($obj->{'@context'});
+	
 	$obj->type = 'Taxon';
 	$obj->id = 'https://bionames.org/cluster/' . $cluster_id;
 	$obj->name = $representative->nameComplete;
@@ -929,6 +937,13 @@ function get_cluster($cluster_id)
 	if (isset($representative->group))
 	{
 		$obj->higherClassification = $representative->group;
+		
+		$parts = explode(";", $obj->higherClassification);
+		$label = array_pop($parts);
+		$label = preg_replace('/^\w+_/', '', $label);
+		
+		$obj->parentTaxon = 'http://www.organismnames.com/query.htm?searchType=tree&q=' . $label;
+		
 	}
 
 	// Get all names for this cluster_id
@@ -977,6 +992,29 @@ function get_database_stats()
 	return $stats;
 }
 
+//----------------------------------------------------------------------------------------
+function tree_get_children($node)
+{
+	$children = array();
+	
+	// get children
+	$sql = "SELECT * FROM tree WHERE parent='" . $node . "'";
+	$data = db_get($sql);
+	
+	foreach ($data as $row)
+	{
+		$child = new stdclass;
+		$child->id = $row->node;
+		$child->name = $row->label;
+		$child->numberOfItems = $row->count;
+		
+		$children[] =  $child;
+	}
+	
+	return $children;
+}
+
+//----------------------------------------------------------------------------------------
 
 if (0)
 {

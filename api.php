@@ -73,6 +73,19 @@ function api_display_search ($q, $callback = '')
 	api_output($obj, $callback, 200);
 }
 
+//--------------------------------------------------------------------------------------------------
+// Path
+function api_display_treemap ($path, $callback = '')
+{	
+	global $config;
+	
+	$status = 404;
+	
+	$items = get_treemap($path, $config['treemap_width'], $config['treemap_height']);
+	
+	api_output($items, $callback, 200);
+}
+
 
 //--------------------------------------------------------------------------------------------------
 function api_main()
@@ -133,8 +146,7 @@ function api_main()
 			$handled = true;
 		}
 	}
-	
-	
+		
 	if (!$handled)
 	{
 		if (isset($_GET['q']))
@@ -150,9 +162,19 @@ function api_main()
 			api_display_search($q, $callback);
 			
 			$handled = true;
-		}
-			
+		}			
 	}
+	
+	if (!$handled)
+	{
+		if (isset($_GET['path']))
+		{	
+			$path = $_GET['path'];
+			
+			api_display_treemap($path, $callback);
+			$handled = true;
+		}
+	}	
 	
 	if (!$handled)
 	{

@@ -30,4 +30,8 @@ else
 // Database-------------------------------------------------------------------------------
 $config['pdo'] = new PDO('sqlite:' . dirname(__FILE__) . '/bionames.db');
 
+
+$config['treemap_width']  = 1200;
+$config['treemap_height'] =  800;
+
 ?>

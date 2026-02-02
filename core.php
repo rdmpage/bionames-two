@@ -1,6 +1,7 @@
 <?php
 
 require_once (dirname(__FILE__) . '/objects.php');
+require_once (dirname(__FILE__) . '/treemap.php');
 
 //----------------------------------------------------------------------------------------
 // From easyrdf/lib/parser/ntriples
@@ -192,11 +193,46 @@ function entity_alternate_names($entity)
 	return $alternate_names;
 }
 
+//----------------------------------------------------------------------------------------
+function get_treemap($path, $width = 1200, $height = 800)
+{
+	//echo $path;
+
+	$nodes = tree_get_children($path);
+
+	// get node and children
+	$items = array();
+		
+	foreach ($nodes as $node)
+	{		
+		$item = new Item(
+			log10($node->numberOfItems + 1), 
+			$node->name, 
+			$node->id,
+			($node->numberOfItems == 1)
+			);
+	
+		array_push($items, $item);
+	}
+	
+	$r = new Rectangle(0,0, $width, $height);
+
+	// Compute the layout
+	splitLayout($items, $r);	
+	
+	return $items;
+}
 
 if (0)
 {
 	$entity = get_entity(1);
 	print_r($entity);
+}
+
+if (0)
+{
+	$path = 'k__Animalia;p__Arthropoda;c__Insecta';
+	get_treemap($path);
 }
 
 
