@@ -4,8 +4,8 @@ RewriteEngine On
 # If you need to use the `RewriteBase` directive, it should be the
 # absolute physical path to the directory that contains this htaccess file.
 #
-#RewriteBase /
-RewriteBase /bionames-two/
+RewriteBase /
+#RewriteBase /bionames-two/
 
 # Reference
 RewriteRule ^references/(.*)   	index.php?id=$1&namespace=references   [NC,L]
@@ -21,4 +21,12 @@ RewriteRule ^names/urn:lsid:organismnames.com:name:(\d+)   		index.php?namespace
 
 # Cluster of taxonomic names
 RewriteRule ^names/cluster/(.*)   		index.php?namespace=cluster&id=$1   [NC,L]
+
+# Search
+RewriteRule ^search/(.*)   		index.php?q=$1   [NC,L]
+
+# Identifiers
+RewriteRule ^urn:lsid:organismnames.com:name:(\d+)   		index.php?namespace=names&id=$1   [NC,L]
+
+
 

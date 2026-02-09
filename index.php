@@ -76,11 +76,13 @@ function internal_identifier_link($id)
 	switch ($namespace)
 	{
 		case 'issn':
-			$link = '?namespace=issn&id=' . $value ;			
+			$link = '?namespace=issn&id=' . $value ;
+			$link = 'issn/' . $value ;				
 			break;
 
 		case 'oclc':
-			$link = '?namespace=oclc&id=' . $value ;			
+			$link = '?namespace=oclc&id=' . $value ;	
+			$link = 'oclc/' . $value ;			
 			break;
 						
 		default:
@@ -119,7 +121,7 @@ function id_to_key_value($id)
 		
 	if (preg_match('/urn:lsid:organismnames.com:name:(\d+)$/', $id, $m))
 	{
-		$kv = ['names', $m[1]];
+		$kv = ['names', $id];
 	}
 
 	return $kv;
@@ -246,7 +248,8 @@ function display_datafeed($feed)
 		
 		$kv = id_to_key_value($dataFeedElement->item->id);
 
-		echo '<a href="?id=' . $kv[1] . '&namespace=' . $kv[0] . '">';
+		//echo '<a href="?id=' . $kv[1] . '&namespace=' . $kv[0] . '">';
+		echo '<a href="' . $kv[0] . '/' . $kv[1] . '">';
 		
 		echo entity_name($dataFeedElement->item);
 		echo '</a>';
@@ -331,7 +334,8 @@ function display_entity_details($doc)
 
 			// Extract namespace and id from the sameAs identifier
 			$ns_id = id_to_key_value($sameAs_id);
-			echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+			//echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+			echo '<a href="' . $ns_id[0] . '/' . $ns_id[1] . '">';
 			echo htmlspecialchars($sameAs_id);
 			echo '</a>';
 		}
@@ -370,7 +374,8 @@ function display_entity_details($doc)
 					if ($main_entity->taxonRank == 'genus')
 					{
 						echo '<span class="genericName">';
-						echo '<a href="?q=genus:' . $main_entity->uninomial . '">';
+						//echo '<a href="?q=genus:' . $main_entity->uninomial . '">';
+						echo '<a href="search/genus:' . $main_entity->uninomial . '">';
 						echo $main_entity->uninomial;
 						echo '</a>';	
 						echo '</span>';			
@@ -396,7 +401,8 @@ function display_entity_details($doc)
 				{
 					// genusPart
 					echo '<span class="genericName">';
-					echo '<a href="?q=genus:' . $main_entity->genericName . '">';
+					//echo '<a href="?q=genus:' . $main_entity->genericName . '">';
+					echo '<a href="search/genus:' . $main_entity->genericName . '">';
 					echo $main_entity->genericName;
 					echo '</a>';	
 					echo '</span>';	
@@ -486,7 +492,8 @@ function display_entity_details($doc)
 					
 					echo '<div>';
 					echo '<h3>Based on</h3>';
-					echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+					//echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+					echo '<a href="' . $ns_id[0] . '/' . $ns_id[1] . '">';
 					
 					if ($citation != '')
 					{
@@ -535,7 +542,8 @@ function display_entity_details($doc)
 	
 					if ($ns_id[0] && $ns_id[1])
 					{
-						echo '<a href="?namespace=' . $ns_id[0] . '&id=' . $ns_id[1] . '">';
+						//echo '<a href="?namespace=' . $ns_id[0] . '&id=' . $ns_id[1] . '">';
+						echo '<a href="' .  $ns_id[0] . '/' . $ns_id[1] . '">';
 					}
 	
 					echo htmlspecialchars($scientificName->name);
@@ -603,7 +611,8 @@ function display_entity_details($doc)
 					
 					echo '<div>';
 					echo '<p>Is part of ';
-					echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+					//echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+					echo '<a href="' . $ns_id[0] . '/' . $ns_id[1] . '">';
 					echo $link_name;
 					echo '</a>';
 					echo '</p>';
@@ -696,7 +705,7 @@ function display_entity_details($doc)
 				{
 					if (preg_match('/^hash:\/\/sha1/', $encoding->contentUrl, ))
 					{
-						echo '<script>display_pdf("http://localhost/content-store-cloud-client/' . $encoding->contentUrl . '");</script>';
+						echo '<script>display_pdf("https://content.bionames.org/' . $encoding->contentUrl . '");</script>';
 					}
 					else
 					{
@@ -743,10 +752,22 @@ function display_html_start($title = '')
 	echo '<!DOCTYPE html>
 <head>';
 
+	echo "<!-- Google tag (gtag.js) -->
+<script async src=\"https://www.googletagmanager.com/gtag/js?id=G-SVMSQMQR1X\"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-SVMSQMQR1X');
+</script>";
+
 	echo '<meta charset="utf-8">';
 	
 	echo '<!-- base -->
     	<base href="' . $config['web_root'] . '" /><!--[if IE]></base><![endif]-->' . "\n";
+    
+    echo '<link href="favicon.png" rel="icon" type="image/png">';
     	
     if ($title == '')
     {
@@ -942,7 +963,8 @@ function display_search($q)
 
 			if ($item_id)
 			{
-				echo '<a href="?namespace=names&id=' . $item_id . '">';
+				//echo '<a href="?namespace=names&id=' . $item_id . '">';
+				echo '<a href="names/urn:lsid:organismnames.com:name:' . $item_id  . '">';
 			}
 
 			echo htmlspecialchars($cluster['representative']->item->name);
@@ -974,6 +996,7 @@ function display_search($q)
 					if ($dup_id)
 					{
 						echo '<a href="?namespace=names&id=' . $dup_id . '">';
+						echo '<a href="names/urn:lsid:organismnames.com:name:' . $dup_id  . '">';
 					}
 
 					echo htmlspecialchars($duplicate->item->name);
@@ -1043,8 +1066,6 @@ function display_container_list($letter = '')
 		foreach ($doc->dataFeedElement as $container)
 		{
 			echo '<li>';
-			//echo '<a href="' . $work->{'@id'} . '">' . $work->item->name . '</a>';
-
 			if (isset($container->item->id))
 			{
 				echo '<a href="' . internal_identifier_link($container->item->id) . '">';

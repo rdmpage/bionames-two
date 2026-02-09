@@ -15,7 +15,7 @@ date_default_timezone_set('UTC');
 $config['site_name'] 	= 'BioNames';
 
 $local = true;
-//$local = false;
+$local = false;
 
 if ($local)
 {
