@@ -1089,20 +1089,32 @@ function default_display($error_msg = '')
 	{
 		// Get database statistics
 		$stats = get_database_stats();
+		
+		echo '<div class="headline">';
 
 		echo '<h1>Welcome to BioNames</h1>';
 
 		echo '<h2>Database Statistics</h2>';
 		echo '<dl>';
+		
 		echo '<dt>Total names</dt>';
 		echo '<dd>' . number_format($stats->total_names) . '</dd>';
 
 		echo '<dt>Distinct name clusters</dt>';
 		echo '<dd>' . number_format($stats->total_clusters) . '</dd>';
 
+		echo '<dt>Names with publications</dt>';
+		echo '<dd>' . number_format($stats->names_with_publications) . '</dd>';
+
 		echo '<dt>Names with DOIs</dt>';
 		echo '<dd>' . number_format($stats->names_with_dois) . '</dd>';
+
+		echo '<dt>Names with free PDFs</dt>';
+		echo '<dd>' . number_format($stats->names_with_content_sha1) . '</dd>';
+		
 		echo '</dl>';
+		
+		echo '</div>';
 	}
 
 	display_main_end();
@@ -1160,29 +1172,6 @@ function display_path($path)
 
 	display_main_end();
 	display_html_end();
-	
-
-	/*
-	$title = classification_label($path);
-
-	display_html_start($title);
-	display_navbar('');
-	display_main_start();
-
-	echo '<h1>' . htmlspecialchars($title) . '</h1>';
-	
-	display_classification_breadcrumbs($path);	
-	
-	echo '<div id="treemap"></div>';
-	
-	
-	echo '<script>
-	drawTreemap("' . $path . '");	
-	</script>';
-
-	display_main_end();
-	display_html_end();
-	*/
 }
 
 //----------------------------------------------------------------------------------------

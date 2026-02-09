@@ -996,6 +996,16 @@ function get_database_stats()
 	$sql = "SELECT COUNT(*) as count FROM names WHERE doi IS NOT NULL AND doi != ''";
 	$data = db_get($sql);
 	$stats->names_with_dois = $data[0]->count;
+	
+	// Number of names with content (freely viewable PDFs)
+	$sql = "SELECT COUNT(*) as count FROM names WHERE content_sha1 IS NOT NULL";
+	$data = db_get($sql);
+	$stats->names_with_content_sha1 = $data[0]->count;
+
+	// Number of names with a publication
+	$sql = "SELECT COUNT(*) as count FROM names WHERE publication IS NOT NULL";
+	$data = db_get($sql);
+	$stats->names_with_publications = $data[0]->count;
 
 	return $stats;
 }

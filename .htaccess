@@ -7,8 +7,6 @@ RewriteEngine On
 #RewriteBase /
 RewriteBase /bionames-two/
 
-RewriteRule ^references/$   ?isbn=$1 [NC,L]
-
 # Reference
 RewriteRule ^references/(.*)   	index.php?id=$1&namespace=references   [NC,L]
 

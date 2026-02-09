@@ -12,9 +12,10 @@ global $config;
 // Date timezone
 date_default_timezone_set('UTC');
 
-$config['site_name'] 	= 'My site';
+$config['site_name'] 	= 'BioNames';
 
 $local = true;
+//$local = false;
 
 if ($local)
 {
