@@ -1,13 +1,14 @@
+//----------------------------------------------------------------------------------------
 function display_pdf(pdf_url) {
 	var page = 1;
 	var page_to_display = page || 1;
 
-	var pdfjs_url 	= 'pdfjs/web/viewer.html?file=';
+	var pdfjs_url 	= 'pdfjs-2/web/viewer.html?file=';
 
 	var proxy_url 	= '../../pdfproxy.php?url=';
 
-	var html = '<p><a href="' + pdf_url + '" target="_new">PDF</a></p>'
-		+ '<iframe id="pdf" width="100%" height="700" frameBorder="0" src="'
+	//var html = '<p><a href="' + pdf_url + '" target="_new">PDF</a></p>';
+	var html = '<iframe id="pdfviewer" width="100%" height="700" frameBorder="0" src="'
 		+ pdfjs_url
 		+ encodeURIComponent(proxy_url + encodeURIComponent(pdf_url))
 		+ '#page=' + page_to_display + '"/>';
@@ -18,6 +19,7 @@ function display_pdf(pdf_url) {
 	output.style.display = "block";
 }
 
+//----------------------------------------------------------------------------------------
 // Render citation from CSL JSON
 function display_citation(cslJson, format) {
 	try {
@@ -49,6 +51,7 @@ function display_citation(cslJson, format) {
 	}
 }
 
+//----------------------------------------------------------------------------------------
 // Show formatted citation from encoding
 function show_citation(cslJsonText, format) {
 	var outputDiv = document.getElementById('citation-output');
@@ -65,6 +68,7 @@ function show_citation(cslJsonText, format) {
 	}
 }
 
+//----------------------------------------------------------------------------------------
 function drawTreemap(path) {
 	var url = 'api.php?path=' + encodeURIComponent(path);
 	
@@ -80,12 +84,6 @@ function drawTreemap(path) {
 				for (var i in data) {
 					html += '<div class="cell"'
 						+ ' style="' 
-						/*
-						+ 'top:' + data[i].bounds.y + 'px;'
-						+ 'left:' + data[i].bounds.x + 'px;'
-						+ 'width:' + data[i].bounds.w + 'px;'
-						+ 'height:' + data[i].bounds.h + 'px;'
-						*/
 						+ 'top:calc(' + data[i].bounds.y + ' / var(--h) * 100%);'
 						+ 'left:calc(' + data[i].bounds.x + ' / var(--w) * 100%);'
 						+ 'width:calc(' + data[i].bounds.w + ' / var(--w) * 100%);'
@@ -107,10 +105,11 @@ function drawTreemap(path) {
 					
 					html += '</a>';	
 					
-					html += '</div>';		
-				
-				
+					html += '</div>';
+				}
+				if (html != '') {
 					document.getElementById("treemap").innerHTML = html;
+					document.getElementById("treemap").style.display = "block"; 
 				}
 			});
 		});

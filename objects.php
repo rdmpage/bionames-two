@@ -1,9 +1,23 @@
 <?php
 
+ini_set('memory_limit', '-1');
+
 // Output things from BioNames as JSON-LD, but in a way that is easy for client to
 // process. For example, we alias "@id" to "id"
 
 require_once (dirname(__FILE__) . '/sqlite.php');
+
+
+//----------------------------------------------------------------------------------------
+function classification_label($higherClassification)
+{
+	$parts = explode(';', $higherClassification);
+	$label = array_pop($parts);
+	$label = preg_replace('/^\w+__/', '', $label);
+	
+	return $label;
+}
+
 
 //----------------------------------------------------------------------------------------
 function get_reference_type($row)
@@ -66,7 +80,11 @@ function add_work_context($context)
 
 	// PRISM
 	$context->prism = 'http://prismstandard.org/namespaces/basic/2.0/';
-	$context->doi = 'prism:doi';			
+	$context->doi = 'prism:doi';
+	
+	// BIBO
+	$context->bibo = 'http://purl.org/ontology/bibo/';
+	$context->handle = 'bibo:handle';				
 
 	return $context;
 }
@@ -77,8 +95,12 @@ function add_container_context($context)
 	// ISSN
 	$context->issn = 'http://issn.org/resource/ISSN/';
 	
-	// OCLC
-	$context->oclc = 'https://worldcat.org/oclc/';
+	// BIBO
+	if (!isset($context->bibo))
+	{
+		$context->bibo = 'http://purl.org/ontology/bibo/';
+	}
+	$context->oclcnum = 'bibo:oclcnum';				
 
 	return $context;
 }
@@ -123,7 +145,10 @@ function add_taxon_context($context)
 function db_row_to_reference(
 	$row, 
 	$embedded = false,
-	$keys = ['sici', 'title', 'journal', 'volume', 'issue', 'spage', 'epage', 'year','issn', 'isbn', 'oclc', 'publisher', 'doi', 'url']
+	$keys = ['sici', 'title', 'journal', 'volume', 'issue', 'spage', 'epage', 'year',
+		'issn', 'isbn', 'oclc', 'publisher', 
+		'doi', 'handle', 
+		'url']
 	)
 {
 	$obj = new stdclass;
@@ -169,6 +194,10 @@ function db_row_to_reference(
 					$obj->pageEnd = $row->{$k};
 					break;	
 					
+				case 'handle':
+					$obj->handle = $row->{$k};
+					break;					
+					
 				case 'issn':
 					break;		
 					
@@ -212,6 +241,7 @@ function db_row_to_reference(
 					{
 						$obj->isPartOf->id = 'https://worldcat.org/oclc/' . $row->oclc;
 						$obj->isPartOf->type = 'Periodical';
+						$obj->isPartOf->oclcnum = $row->oclc;
 					}						
 					elseif (isset($row->isbn))
 					{
@@ -280,6 +310,8 @@ function db_row_to_reference(
 		$encoding->contentUrl = 'hash://sha1/' . $row->content_sha1;
 		
 		$obj->encoding[] = $encoding;
+		
+		$obj->isAccessibleForFree = true;
 	}
 
 	return $obj;
@@ -388,7 +420,14 @@ function get_reference_csl($id)
 						break;
 
 					case 'epage':
-						$obj->page .= '-' . $row->{$k};
+						if (isset($obj->page))
+						{
+							$obj->page .= '-' . $row->{$k};
+						}
+						else
+						{
+							$obj->page = $row->{$k};
+						}
 						break;	
 						
 					case 'url':
@@ -420,7 +459,7 @@ function get_names_in_reference($sici)
 	$feed->{'@context'} = create_context();
 	$feed->{'@context'} = add_taxon_context($feed->{'@context'});
 	$feed->type = 'DataFeed';
-	$feed->name = 'Names published in this reference';
+	$feed->name = 'Names published in this work';
 
 	$feed->dataFeedElement = [];
 
@@ -468,6 +507,7 @@ function get_container($namespace, $id)
 	switch ($namespace)
 	{
 		case 'oclc':
+		case 'oclcnum':
 			$sql .= ' oclc="' . $id . '"';
 			break;
 			
@@ -490,7 +530,7 @@ function get_container($namespace, $id)
 		switch ($namespace)
 		{
 			case 'oclc':
-				$obj->oclc = $id;
+				$obj->oclcnum = $id;
 				$obj->id = 'https://worldcat.org/oclc/' . $id;	
 				$obj->type = 'CreativeWork';
 				break;
@@ -555,11 +595,12 @@ function get_container_works_list($namespace, $id)
 	$feed->dataFeedElement = [];
 	
 
-	$sql = 'SELECT DISTINCT sici, title, journal, volume, issue, spage, epage, year, doi  FROM names';
+	$sql = 'SELECT DISTINCT sici, title, journal, volume, issue, spage, epage, year, doi, content_sha1  FROM names';
 	
 	switch ($namespace)
 	{
 		case 'oclc':
+		case 'oclcnum':
 			$sql .= ' WHERE oclc="' . $id . '"';
 			break;
 	
@@ -574,7 +615,7 @@ function get_container_works_list($namespace, $id)
 	$data = db_get($sql);
 	
 	// keys relevant to a simple list of references
-	$keys = ['sici', 'title', 'journal', 'year', 'doi'];
+	$keys = ['sici', 'title', 'journal', 'year', 'doi', 'content_sha1'];
 	
 	foreach ($data as $row)
 	{
@@ -667,7 +708,7 @@ function get_container_list($letter = 'A')
 			}
 			if (isset($row->oclc))
 			{
-				$results[$key]->oclc = $row->oclc;
+				$results[$key]->oclcnum = $row->oclc;
 			}
 			if (isset($row->isbn))
 			{
@@ -692,11 +733,11 @@ function get_container_list($letter = 'A')
 			$container->type = 'Periodical';
 			$container->issn = $r->issn;			
 		}
-		elseif (isset($r->oclc))
+		elseif (isset($r->oclcnum))
 		{
-			$container->id = 'https://worldcat.org/oclc/' . $r->oclc;	
+			$container->id = 'https://worldcat.org/oclc/' . $r->oclcnum;	
 			$container->type = 'CreativeWork';	
-			$container->oclc = $r->oclc;	
+			$container->oclcnum = $r->oclcnum;	
 		}
 		elseif (isset($r->isbn))
 		{
@@ -870,39 +911,6 @@ function search_names($query)
 	return $feed;
 }
 
-
-
-if (0)
-{
-	$feed = get_container_list('E');
-
-	print_r($feed);
-}
-
-if (0)
-{
-
-	$id = 'b174d24aeb9fa81d4f34b5b181b52d92';
-	$obj = get_reference($id);
-	print_r($obj);
-
-	echo json_encode($obj) . "\n";
-}
-
-if (0)
-{
-	$obj = get_container('issn', '0260-1230');
-	print_r($obj);
-	echo json_encode($obj) . "\n";
-}
-
-if (0)
-{
-	$obj = get_reference_csl($id);
-	print_r($obj);
-}
-
-
 //----------------------------------------------------------------------------------------
 // Get cluster (taxon) - all names that share the same cluster_id
 function get_cluster($cluster_id)
@@ -1015,6 +1023,86 @@ function tree_get_children($node)
 }
 
 //----------------------------------------------------------------------------------------
+// List of works in container (e.g., articles in a journal)
+function get_works_path_year($path, $year, $limit = 100)
+{
+	$feed = new stdclass;
+	$feed->{@context} = create_context();
+	$feed->{@context} = add_container_context($feed->{@context});
+	$feed->type = 'DataFeed';
+	
+	// label feed
+	if ((int)$year === (int)date('Y'))
+	{
+		$feed->name = $limit .' most recent works on taxon ' . classification_label($path);
+	}
+	else
+	{
+		$feed->name = $limit . ' works on taxon ' . classification_label($path) . ' for year ' . $year;
+	}
+
+	$feed->dataFeedElement = [];
+	
+	$sql = 'SELECT DISTINCT sici, title, journal, volume, issue, spage, epage, year, doi, content_sha1 FROM names';
+	$sql .= ' WHERE "group" LIKE "' . $path . '%"';
+	$sql .= ' AND year=' . $year;
+	$sql .= ' LIMIT ' . $limit;
+		
+	$data = db_get($sql);
+	
+	// keys relevant to a simple list of references
+	$keys = ['sici', 'title', 'journal', 'year', 'doi', 'content_sha1'];
+	
+	foreach ($data as $row)
+	{
+		$item = new stdclass;
+		$item->type = 'DataFeedItem';
+		
+		$item->item = db_row_to_reference($row, true, $keys);		
+		$feed->dataFeedElement[] = $item;	
+	}
+	
+	return $feed;
+}
+
+//----------------------------------------------------------------------------------------
+// Get higher taxon, its classification, and something about it...
+function get_taxon($label)
+{
+	$result = [];
+	
+	$sql = "SELECT * FROM tree WHERE label='$label' LIMIT 1";
+
+	$data = db_get($sql);
+
+	if (count($data) == 0)
+	{
+		return $result;
+	}
+
+	// Create the higher taxon entity
+	$obj = new stdclass;
+	$obj->{'@context'} = create_context();
+	$obj->{'@context'} = add_taxon_context($obj->{'@context'});
+	
+	$obj->type = 'Taxon';
+	$obj->id = 'http://www.organismnames.com/query.htm?searchType=tree&q=' . $label;
+	$obj->name = $label;
+	
+	$obj->higherClassification = $data[0]->node;
+	
+	$result[] = $obj;
+	
+	//$feed = get_works_path_year($obj->higherClassification, date('Y'));
+	$feed = get_works_path_year($obj->higherClassification, 2025);
+	
+	$result[] = $feed;
+	
+	return $result;
+}
+
+
+//----------------------------------------------------------------------------------------
 
 if (0)
 {
@@ -1025,5 +1113,43 @@ if (0)
 	echo json_encode($obj) . "\n";
 
 }
+
+
+if (0)
+{
+	$feed = get_container_list('E');
+
+	print_r($feed);
+}
+
+if (0)
+{
+
+	$id = 'b174d24aeb9fa81d4f34b5b181b52d92';
+	$obj = get_reference($id);
+	print_r($obj);
+
+	echo json_encode($obj) . "\n";
+}
+
+if (0)
+{
+	$obj = get_container('issn', '0260-1230');
+	print_r($obj);
+	echo json_encode($obj) . "\n";
+}
+
+if (0)
+{
+	$obj = get_reference_csl($id);
+	print_r($obj);
+}
+
+if (0)
+{
+	$obj = get_taxon('Insecta');
+	print_r($obj);
+}
+
 
 ?>

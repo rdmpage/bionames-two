@@ -24,20 +24,24 @@ function external_identifier_link($namespace, $value)
 	switch ($namespace)
 	{
 		case 'doi':
-			$html = '<a href="https://doi.org/' . $value . '" target="_new">' . $value . '</a>';			
+			$html = '<a class="external" href="https://doi.org/' . $value . '" target="_new">' . $value . '</a>';			
+			break;
+
+		case 'handle':
+			$html = '<a class="external" href="https://hdl.handle.net/' . $value . '" target="_new">' . $value . '</a>';			
 			break;
 
 		case 'issn':
-			$html = '<a href="http://portal.issn.org/resource/ISSN/' . $value . '" target="_new">' . $value . '</a>';			
+			$html = '<a class="external" href="http://portal.issn.org/resource/ISSN/' . $value . '" target="_new">' . $value . '</a>';			
 			break;
 			
 		case 'lsid':
 			//$html = '<a href="https://lsid.io/' . $value . '" target="_new">' . $value . '</a>';			
-			$html = '<a href="http://www.organismnames.com/details.htm?lsid=' . str_replace('urn:lsid:organismnames.com:name:', '', $value) . '" target="_new">' . $value . '</a>';			
+			$html = '<a class="external" href="http://www.organismnames.com/details.htm?lsid=' . str_replace('urn:lsid:organismnames.com:name:', '', $value) . '" target="_new">' . $value . '</a>';			
 			break;
 
-		case 'oclc':
-			$html = '<a href="https://worldcat.org/oclc/' . $value . '" target="_new">' . $value . '</a>';			
+		case 'oclcnum':
+			$html = '<a class="external" href="https://worldcat.org/oclc/' . $value . '" target="_new">' . $value . '</a>';			
 			break;
 						
 		default:
@@ -121,16 +125,6 @@ function id_to_key_value($id)
 	return $kv;
 }
 
-//----------------------------------------------------------------------------------------
-function classification_label($higherClassification)
-{
-	$parts = explode(';', $higherClassification);
-	$label = array_pop($parts);
-	$label = preg_replace('/^\w+__/', '', $label);
-	
-	return $label;
-}
-
 
 //----------------------------------------------------------------------------------------
 function display_classification_breadcrumbs($higherClassification)
@@ -171,7 +165,7 @@ function display_classification_breadcrumbs($higherClassification)
 
 	if ($image != '')
 	{
-		echo '<img height="60" src="' . $image . '">';
+		echo '<img style="opacity:0.6" height="60" src="' . $image . '">';
 	}
 
 	echo '<div>';
@@ -190,10 +184,95 @@ function display_classification_breadcrumbs($higherClassification)
 }
 
 //----------------------------------------------------------------------------------------
+function display_entity_type($entity)
+{	
+	echo '<div class="type">' . $entity->type . '</div>';
+}
+
+
+//----------------------------------------------------------------------------------------
+function encoding_to_citation($encoding, $format = 'apa')
+{	
+	$citation = '';
+	
+	if ($encoding)
+	{
+		$csljson = [];
+		
+		foreach ($encoding as $encoding)
+		{
+			if ($encoding->encodingFormat == 'application/vnd.citationstyles.csl+json')
+			{
+				$csljson = [json_decode($encoding->text)];
+				break;
+			}
+		}
+		
+		if (count($csljson) == 1)
+		{
+			$style_sheet = StyleSheet::loadStyleSheet($format);
+			$citeProc = new CiteProc($style_sheet);
+			$citation = $citeProc->render($csljson, "bibliography");
+		}							
+	}
+	
+	return $citation;
+}
+
+//----------------------------------------------------------------------------------------
+function display_datafeed($feed)
+{
+	echo '<h2>' . entity_name($feed) . '</h2>';
+	echo '<ul style="padding-left:1em;">';
+	foreach ($feed->dataFeedElement as $dataFeedElement)
+	{
+		if (in_array($dataFeedElement->item->type, ['Book', 'Chapter', 'CreativeWork', 'ScholarlyArticle']))
+		{
+			$list_class = 'closed';
+			
+			if (isset($dataFeedElement->item->isAccessibleForFree))
+			{
+				if ($dataFeedElement->item->isAccessibleForFree)
+				{
+					$list_class = 'open';
+				}
+			}
+			echo '<li class="' . $list_class . '">';
+		}
+		else
+		{
+			echo '<li>';
+		}
+		
+		$kv = id_to_key_value($dataFeedElement->item->id);
+
+		echo '<a href="?id=' . $kv[1] . '&namespace=' . $kv[0] . '">';
+		
+		echo entity_name($dataFeedElement->item);
+		echo '</a>';
+
+		echo '<br/>';
+		if (isset($dataFeedElement->item->doi))
+		{
+			echo $dataFeedElement->item->doi;
+		}
+		
+		echo '</li>';
+	}
+	echo '</ul>';
+}
+
+
+//----------------------------------------------------------------------------------------
 function display_entity_details($doc)
 {	
+	echo '<div class="headline">';
+
 	// Any entity
 	$main_entity = $doc[0];
+	
+	display_entity_type($main_entity);
+	
 	echo '<h1>' . entity_name($main_entity) . '</h1>';
 	
 	// identifiers
@@ -213,16 +292,23 @@ function display_entity_details($doc)
 		echo '<dt>DOI</dt>';				
 		echo '<dd>' . external_identifier_link('doi', $main_entity->doi) . '</dd>';		
 	}
+	
+	if (isset($main_entity->handle))
+	{
+		echo '<dt>Handle</dt>';				
+		echo '<dd>' . external_identifier_link('handle', $main_entity->handle) . '</dd>';		
+	}
+	
 	if (isset($main_entity->issn))
 	{
 		echo '<dt>ISSN</dt>';				
 		echo '<dd>' . external_identifier_link('issn', $main_entity->issn) . '</dd>';		
 	}
 
-	if (isset($main_entity->oclc))
+	if (isset($main_entity->oclcnum))
 	{
 		echo '<dt>OCLC</dt>';
-		echo '<dd>' . external_identifier_link('oclc', $main_entity->oclc) . '</dd>';
+		echo '<dd>' . external_identifier_link('oclcnum', $main_entity->oclcnum) . '</dd>';
 	}
 
 	// sameAs - for TaxonName entities that are duplicates pointing to representative
@@ -253,8 +339,7 @@ function display_entity_details($doc)
 	}
 
 	echo '</dl>';
-	
-	
+		
 	// other names
 	$alternate_names = entity_alternate_names($main_entity);
 	if (count($alternate_names) > 0)
@@ -269,340 +354,340 @@ function display_entity_details($doc)
 		echo '</ul>';
 	}
 	
-	if ($main_entity->type == 'TaxonName')
+	switch ($main_entity->type)
 	{
-		echo '<div>';
-		echo '<div>';
-		
-		// show name in a way we make parts of it clickable 
-		
-		if (isset($main_entity->uninomial))
-		{		
-			if (isset($main_entity->taxonRank))
-			{
-				if ($main_entity->taxonRank == 'genus')
+		//--------------------------------------------------------------------------------
+		case 'TaxonName': 
+			echo '<div>';
+			echo '<div>';
+			
+			// show name in a way we make parts of it clickable 
+			
+			if (isset($main_entity->uninomial))
+			{		
+				if (isset($main_entity->taxonRank))
 				{
-					echo '<span class="genericName">';
-					echo '<a href="?q=genus:' . $main_entity->uninomial . '">';
-					echo $main_entity->uninomial;
-					echo '</a>';	
-					echo '</span>';			
+					if ($main_entity->taxonRank == 'genus')
+					{
+						echo '<span class="genericName">';
+						echo '<a href="?q=genus:' . $main_entity->uninomial . '">';
+						echo $main_entity->uninomial;
+						echo '</a>';	
+						echo '</span>';			
+					}
+					else
+					{
+						echo '<span class="' . $main_entity->taxonRank . '">';
+						echo $main_entity->uninomial;
+						echo '</span>';
+					}
 				}
 				else
 				{
-					echo '<span class="' . $main_entity->taxonRank . '">';
+					// shouldn't happen but see e.g. Cangshanaltica
+					echo '<span class="unranked">';
 					echo $main_entity->uninomial;
-					echo '</span>';
+					echo '</span>';				
 				}
 			}
 			else
 			{
-				// shouldn't happen but see e.g. Cangshanaltica
-				echo '<span class="unranked">';
-				echo $main_entity->uninomial;
-				echo '</span>';				
-			}
-		}
-		else
-		{
-			if (isset($main_entity->genericName))
-			{
-				// genusPart
-				echo '<span class="genericName">';
-				echo '<a href="?q=genus:' . $main_entity->genericName . '">';
-				echo $main_entity->genericName;
-				echo '</a>';	
-				echo '</span>';	
-				
-				// subgenus
-				if (isset($main_entity->infragenericEpithet))
+				if (isset($main_entity->genericName))
 				{
-					echo ' ';
-					echo '<span class="infragenericEpithet">';
-					echo '(';
-					echo $main_entity->infragenericEpithet;
-					echo ')';
-					echo '</span>';
-				}
-	
-	
-				if (isset($main_entity->specificEpithet))
-				{
-					echo ' ';
-					echo '<span class="specificEpithet">';
-					echo $main_entity->specificEpithet;
-					echo '</span>';
-				}
-	
-				if (isset($main_entity->infraspecificEpithet))
-				{
-					echo ' ';
-					echo '<span class="infraspecificEpithet">';
-					echo $main_entity->infraspecificEpithet;
-					echo '</span>';
-				}
-			}
-			else
-			{
-				// shouldn't happen, but name might not be parsed
-				echo '<span>';
-				echo $main_entity->name;
-				echo '</span>';			
-			}
-			
-		
-		}
-		
-		if (isset($main_entity->author))
-		{
-			echo '&nbsp;';
-			echo $main_entity->author;
-		}
-		echo '</div>';
-		
-		if (isset($main_entity->higherClassification))
-		{
-			display_classification_breadcrumbs($main_entity->higherClassification);
-		}
-	}
-
-	// Taxon type - display scientific names in cluster
-	if ($main_entity->type == 'Taxon')
-	{
-		if (isset($main_entity->taxonRank))
-		{
-			echo '<div>';
-			echo '<strong>Rank:</strong> ' . htmlspecialchars($main_entity->taxonRank);
-			echo '</div>';
-		}
-
-		// Display higher classification (same as for TaxonName)
-		if (isset($main_entity->higherClassification))
-		{
-			display_classification_breadcrumbs($main_entity->higherClassification);
-		}
-
-		if (isset($main_entity->scientificName) && count($main_entity->scientificName) > 0)
-		{
-			echo '<h2>Scientific Names</h2>';
-			echo '<ul>';
-			foreach ($main_entity->scientificName as $scientificName)
-			{
-				echo '<li>';
-
-				// Use id_to_key_value to extract namespace and id
-				$ns_id = id_to_key_value($scientificName->id);
-
-				if ($ns_id[0] && $ns_id[1])
-				{
-					echo '<a href="?namespace=' . $ns_id[0] . '&id=' . $ns_id[1] . '">';
-				}
-
-				echo htmlspecialchars($scientificName->name);
-
-				if ($ns_id[0] && $ns_id[1])
-				{
-					echo '</a>';
-				}
-
-				// Display author if available
-				if (isset($scientificName->author))
-				{
-					echo ' ' . htmlspecialchars($scientificName->author);
-				}
-
-				echo '</li>';
-			}
-			echo '</ul>';
-		}
-	}
-
-
-	// specific
-	if (isset($main_entity->isBasedOn))
-	{
-		$link_id = '';
-		$link_name = '[Unknown]';
-		
-		$csljson = '';
-		
-		if (is_string($main_entity->isBasedOn))
-		{
-			$link_id = $main_entity->isBasedOn;
-		}
-		else
-		{
-			if (isset($main_entity->isBasedOn->id))
-			{
-				$link_id = $main_entity->isBasedOn->id;
-			}
-			if (isset($main_entity->isBasedOn->name))
-			{
-				$link_name = $main_entity->isBasedOn->name;
-			}
-			
-			// CSL-JSON
-			if (isset($main_entity->isBasedOn->encoding))
-			{
-				foreach ($main_entity->isBasedOn->encoding as $encoding)
-				{
-					if ($encoding->encodingFormat == 'application/vnd.citationstyles.csl+json')
+					// genusPart
+					echo '<span class="genericName">';
+					echo '<a href="?q=genus:' . $main_entity->genericName . '">';
+					echo $main_entity->genericName;
+					echo '</a>';	
+					echo '</span>';	
+					
+					// subgenus
+					if (isset($main_entity->infragenericEpithet))
 					{
-						$csljson = [json_decode($encoding->text)];
-						break;
+						echo ' ';
+						echo '<span class="infragenericEpithet">';
+						echo '(';
+						echo $main_entity->infragenericEpithet;
+						echo ')';
+						echo '</span>';
+					}
+				
+					if (isset($main_entity->specificEpithet))
+					{
+						echo ' ';
+						echo '<span class="specificEpithet">';
+						echo $main_entity->specificEpithet;
+						echo '</span>';
+					}
+		
+					if (isset($main_entity->infraspecificEpithet))
+					{
+						echo ' ';
+						echo '<span class="infraspecificEpithet">';
+						echo $main_entity->infraspecificEpithet;
+						echo '</span>';
 					}
 				}
+				else
+				{
+					// shouldn't happen, but name might not be parsed
+					echo '<span>';
+					echo $main_entity->name;
+					echo '</span>';			
+				}
 			}
 			
-		}
-		
-		if ($link_id != '')
-		{			
-			$ns_id = id_to_key_value($link_id);
-			
-			echo '<div>';
-			echo '<h3>Based on</h3>';
-			echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
-			
-			if ($csljson != '')
+			if (isset($main_entity->author))
 			{
-				$style_sheet = StyleSheet::loadStyleSheet('apa');
-				$citeProc = new CiteProc($style_sheet);
-				$out = $citeProc->render($csljson, "bibliography");
-				
-				echo $out;
+				echo '&nbsp;';
+				echo $main_entity->author;
 			}
-			else
-			{
-				echo $link_name;
-			}
-			echo '</a>';
 			echo '</div>';
-		}
-		else
-		{
-			echo $link_name;
-		}
-	}
-	
-	if (isset($main_entity->isPartOf))
-	{
-		$link_id = '';
-		$link_name = '[Unknown]';
-		if (is_string($main_entity->isPartOf))
-		{
-			$link_id = $main_entity->isPartOf;
-		}
-		else
-		{
-			if (isset($main_entity->isPartOf->id))
-			{
-				$link_id = $main_entity->isPartOf->id;
-			}
-			if (isset($main_entity->isPartOf->name))
-			{
-				$link_name = $main_entity->isPartOf->name;
-			}
-		}
-		
-		if ($link_id != '')
-		{			
-			$ns_id = id_to_key_value($link_id);
 			
-			echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
-			echo $link_name;
-			echo '</a>';
-		}
-		else
-		{
-			echo $link_name;
-		}
+			if (isset($main_entity->higherClassification))
+			{
+				display_classification_breadcrumbs($main_entity->higherClassification);
+			}
+			
+			// specific
+			if (isset($main_entity->isBasedOn))
+			{
+				$link_id = '';
+				$link_name = '[Unknown]';
+				
+				$citation = '';
+				
+				if (is_string($main_entity->isBasedOn))
+				{
+					$link_id = $main_entity->isBasedOn;
+				}
+				else
+				{
+					if (isset($main_entity->isBasedOn->id))
+					{
+						$link_id = $main_entity->isBasedOn->id;
+					}
+					if (isset($main_entity->isBasedOn->name))
+					{
+						$link_name = $main_entity->isBasedOn->name;
+					}
+					
+					// CSL-JSON
+					if (isset($main_entity->isBasedOn->encoding))
+					{
+						$citation = encoding_to_citation($main_entity->isBasedOn->encoding);
+					}
+					
+				}
+				
+				if ($link_id != '')
+				{			
+					$ns_id = id_to_key_value($link_id);
+					
+					echo '<div>';
+					echo '<h3>Based on</h3>';
+					echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+					
+					if ($citation != '')
+					{
+						echo $citation;
+					}
+					else
+					{
+						echo $link_name;
+					}
+					echo '</a>';
+					echo '</div>';
+				}
+				else
+				{
+					echo $link_name;
+				}
+			}
+			
+			break;
+			
+		//--------------------------------------------------------------------------------
+		case 'Taxon':
+			if (isset($main_entity->taxonRank))
+			{
+				echo '<div>';
+				echo '<strong>Rank:</strong> ' . htmlspecialchars($main_entity->taxonRank);
+				echo '</div>';
+			}
+	
+			// Display higher classification (same as for TaxonName)
+			if (isset($main_entity->higherClassification))
+			{
+				display_classification_breadcrumbs($main_entity->higherClassification);
+			}
+	
+			if (isset($main_entity->scientificName) && count($main_entity->scientificName) > 0)
+			{
+				echo '<h2>Scientific Names</h2>';
+				echo '<ul>';
+				foreach ($main_entity->scientificName as $scientificName)
+				{
+					echo '<li>';
+	
+					// Use id_to_key_value to extract namespace and id
+					$ns_id = id_to_key_value($scientificName->id);
+	
+					if ($ns_id[0] && $ns_id[1])
+					{
+						echo '<a href="?namespace=' . $ns_id[0] . '&id=' . $ns_id[1] . '">';
+					}
+	
+					echo htmlspecialchars($scientificName->name);
+	
+					if ($ns_id[0] && $ns_id[1])
+					{
+						echo '</a>';
+					}
+	
+					// Display author if available
+					if (isset($scientificName->author))
+					{
+						echo ' ' . htmlspecialchars($scientificName->author);
+					}
+	
+					echo '</li>';
+				}
+				echo '</ul>';
+			}		
+			break;
+			
+		//--------------------------------------------------------------------------------
+		case 'Book':
+		case 'Chapter':
+		case 'CreativeWork':
+		case 'ScholarlyArticle':	
+		
+			// CSL-JSON
+			if (isset($main_entity->encoding))
+			{
+				$citation = encoding_to_citation($main_entity->encoding);
+				
+				if ($citation != '')
+				{
+					echo '<div class="citation">';
+					echo $citation;
+					echo '</div>';
+				}
+									
+			}
+			
+			if (isset($main_entity->isPartOf))
+			{
+				$link_id = '';
+				$link_name = '[Unknown]';
+				if (is_string($main_entity->isPartOf))
+				{
+					$link_id = $main_entity->isPartOf;
+				}
+				else
+				{
+					if (isset($main_entity->isPartOf->id))
+					{
+						$link_id = $main_entity->isPartOf->id;
+					}
+					if (isset($main_entity->isPartOf->name))
+					{
+						$link_name = $main_entity->isPartOf->name;
+					}
+				}
+				
+				if ($link_id != '')
+				{			
+					$ns_id = id_to_key_value($link_id);
+					
+					echo '<div>';
+					echo '<p>Is part of ';
+					echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+					echo $link_name;
+					echo '</a>';
+					echo '</p>';
+					echo '</div>';
+				}
+				else
+				{
+					echo $link_name;
+				}
+			}	
+			break;
+		
+		//--------------------------------------------------------------------------------
+		default:
+			break;
 	}	
+
+	echo '</div> <!-- headline -->';
 	
 	
 	// PDF
-	echo '<div id="pdf" style="display:none;"></div>';
+	if (in_array($main_entity->type, ['Book','Chapter','CreativeWork','ScholarlyArticle']))		
+	{
+		echo '<div id="pdf" style="display:none;"></div>';
+	}
 	
 	// Entity connections
+	
+	echo '<div class="relationships">';
+	
+	
+	
 	$n = count($doc);
 	for ($i = 0; $i < $n; $i++)
 	{
 		if ($doc[$i]->type == 'DataFeed')
 		{
-			echo '<h2>' . entity_name($doc[$i]) . '</h2>';
-			echo '<ul>';
-			foreach ($doc[$i]->dataFeedElement as $dataFeedElement)
-			{
-				echo '<li>';
-				
-				$item_ns = '';
-				$item_id = '';
-
-				// Handle URL format: https://bionames.org/namespace/id
-				if (preg_match('/.org\/(.*)\/(.*)$/', $dataFeedElement->item->id, $m))
-				{
-					$item_ns = $m[1];
-					$item_id = $m[2];
-				}
-				// Handle LSID format: urn:lsid:organismnames.com:name:id
-				elseif (preg_match('/urn:lsid:organismnames\.com:name:(.+)$/', $dataFeedElement->item->id, $m))
-				{
-					$item_ns = 'names';
-					$item_id = $m[1];
-				}
-
-				echo '<a href="?id=' . $item_id . '&namespace=' . $item_ns . '">';
-				
-				echo entity_name($dataFeedElement->item);
-				echo '</a>';
-
-				echo '<br/>';
-				if (isset($dataFeedElement->item->doi))
-				{
-					echo $dataFeedElement->item->doi;
-				}
-				
-				echo '</li>';
-			}
-			echo '</ul>';
+			display_datafeed($doc[$i]);
 		}
 	}
-
-	// Citation display
-	if (isset($main_entity->encoding))
+	
+	echo '</div> <!-- relationships -->';
+	
+	if (0)
 	{
-		$csl_json = null;
-		foreach ($main_entity->encoding as $encoding)
+		// Citation display
+		if (isset($main_entity->encoding))
 		{
-			if ($encoding->encodingFormat == 'application/vnd.citationstyles.csl+json')
+			$csl_json = null;
+			foreach ($main_entity->encoding as $encoding)
 			{
-				$csl_json = $encoding->text;
-				break;
+				if ($encoding->encodingFormat == 'application/vnd.citationstyles.csl+json')
+				{
+					$csl_json = $encoding->text;
+					break;
+				}
 			}
-		}
-
-		if ($csl_json)
-		{
-			echo '<div>';
-			echo '<h2>Formatted Citation</h2>';
-			echo '<div>';
-			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'apa\')">APA</button> ';
-			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'bibtex\')">BibTeX</button> ';
-			echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'ris\')">RIS</button>';
-			echo '</div>';
-			echo '<div id="citation-output""></div>';
-			echo '</div>';
+	
+			if ($csl_json)
+			{
+				echo '<div>';
+				echo '<h2>Formatted Citation</h2>';
+				echo '<div>';
+				echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'apa\')">APA</button> ';
+				echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'bibtex\')">BibTeX</button> ';
+				echo '<button onclick="show_citation(\'' . htmlspecialchars(addslashes($csl_json), ENT_QUOTES) . '\', \'ris\')">RIS</button>';
+				echo '</div>';
+				echo '<div id="citation-output""></div>';
+				echo '</div>';
+			}
 		}
 	}
 
-	if (1)
+	if (0)
 	{
 		// debug display simplified data
 		echo '<h2>Data</h2>';
 		echo '<div style="font-family:monospace;white-space:pre-wrap;border:1px solid #CCC;padding:1em;">';
 		echo json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		echo '</div>';
-
+	}
+	
+	if (1)
+	{
 		if (isset($main_entity->encoding))
 		{
 			foreach ($main_entity->encoding as $encoding)
@@ -682,16 +767,12 @@ function display_html_start($title = '')
 	require_once (dirname(__FILE__) . '/root.css.inc.php');
 	require_once (dirname(__FILE__) . '/body.css.inc.php');
 	require_once (dirname(__FILE__) . '/nav.css.inc.php');
+	require_once (dirname(__FILE__) . '/lists.css.inc.php');
+	require_once (dirname(__FILE__) . '/taxonomy.css.inc.php');
 	
 echo '
 
 
-/* main column */
-main {
-	width:90vw;
-	padding:1em;
-	margin:auto;
-}
 
 #citation-output {
 	display:none; 
@@ -711,58 +792,7 @@ main {
 	overflow-wrap: break-word;
 }
 
-.family {
-	font-variant: small-caps;
-}
-.subfamily {
-	font-variant: small-caps;
-}
-.genericName {
-	font-style: italic;
-}
-.infragenericEpithet {
-	font-style: italic;
-}
-.specificEpithet {
-	font-style: italic;
-}
-.infraspecificEpithet {
-	font-style: italic;
-}
-.unranked {
-	background-color:orange;
-}
 
-#treemap {
-  --w: ' . $config['treemap_width'] . ';
-  --h: ' . $config['treemap_height'] . ';
-
-  position: relative;
-  width: 100%;
-  aspect-ratio: calc(var(--w) / var(--h));
-}
-
-/* cell in treemap */
-.cell {
-	background-color: #eeeeee;
-	border:1px solid rgb(200,200,200);
-	opacity:0.5;
-	position:absolute;
-	overflow:hidden;
-	text-align:center;
-}
-    
-.cell:hover {
-    border:1px solid rgb(192,192,192);
-    opacity:1.0;
-}
-
-.cell a {
-	text-decoration: none;
-	display: block;
-	width: 100%;
-	height: 100%;
-}
 
 ';
 
@@ -833,6 +863,8 @@ function display_search($q)
 	display_html_start($title);
 	display_navbar($q);
 	display_main_start();
+	
+	echo '<div class="headline">';
 
 	echo '<h1>' . htmlspecialchars($results->name) . '</h1>';
 
@@ -967,12 +999,14 @@ function display_search($q)
 	}
 
 	// Debug display
-	if (1)
+	if (0)
 	{
 		echo '<div style="font-family:monospace;white-space:pre-wrap;border:1px solid black;padding:1em;">';
 		echo json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		echo '</div>';
 	}
+	
+	echo '</div>';
 
 	display_main_end();
 	display_html_end();
@@ -984,7 +1018,7 @@ function display_container_list($letter = '')
 	display_html_start($letter == '' ? 'Containers' : $letter);
 	display_navbar('');
 	display_main_start();
-
+	
 	$letters = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
 
 	echo '<ul style="list-style-type: none;display:block;overflow: auto;">';
@@ -998,7 +1032,9 @@ function display_container_list($letter = '')
 	{
 		$doc = get_container_list($letter);
 
+		echo '<div class="headline">';
 		echo '<h1>' . $letter . '</h1>';
+		echo '</div>';
 
 		// list of titles...
 		echo '<div class="multicolumn">';
@@ -1079,6 +1115,56 @@ function display_path($path)
 {
 	$title = classification_label($path);
 
+	$doc = get_taxon($title);
+	
+	$main_entity = $doc[0];
+	
+	display_html_start($title);
+	display_navbar('');
+	display_main_start();
+		
+	echo '<div class="headline">';
+	echo '<h1>' . htmlspecialchars($main_entity->name) . '</h1>';
+	
+	display_classification_breadcrumbs($main_entity->higherClassification);	
+	
+	echo '</div>';
+	
+	echo '<div id="treemap"></div>';	
+	
+	echo '<script>
+	drawTreemap("' . $path . '");	
+	</script>';
+	
+	echo '<div class="relationships">';
+	$n = count($doc);
+	for ($i = 0; $i < $n; $i++)
+	{
+		if ($doc[$i]->type == 'DataFeed')
+		{
+			display_datafeed($doc[$i]);
+		}
+	}	
+	echo '</div> <!-- relationships -->';
+	
+	
+	if (0)
+	{
+		// debug display simplified data
+		echo '<h2>Data</h2>';
+		echo '<div style="font-family:monospace;white-space:pre-wrap;border:1px solid #CCC;padding:1em;">';
+		echo json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		echo '</div>';
+	}
+	
+
+	display_main_end();
+	display_html_end();
+	
+
+	/*
+	$title = classification_label($path);
+
 	display_html_start($title);
 	display_navbar('');
 	display_main_start();
@@ -1089,12 +1175,14 @@ function display_path($path)
 	
 	echo '<div id="treemap"></div>';
 	
+	
 	echo '<script>
 	drawTreemap("' . $path . '");	
 	</script>';
 
 	display_main_end();
 	display_html_end();
+	*/
 }
 
 //----------------------------------------------------------------------------------------

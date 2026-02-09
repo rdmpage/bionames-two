@@ -1,0 +1,26 @@
+RewriteEngine On
+
+# Some hosts may require you to use the `RewriteBase` directive.
+# If you need to use the `RewriteBase` directive, it should be the
+# absolute physical path to the directory that contains this htaccess file.
+#
+#RewriteBase /
+RewriteBase /bionames-two/
+
+RewriteRule ^references/$   ?isbn=$1 [NC,L]
+
+# Reference
+RewriteRule ^references/(.*)   	index.php?id=$1&namespace=references   [NC,L]
+
+# Container
+RewriteRule ^issn/(.*)   		index.php?namespace=issn&id=$1   [NC,L]
+RewriteRule ^oclc/(.*)   		index.php?namespace=oclc&id=$1   [NC,L]
+RewriteRule ^oclcnum/(.*)   	index.php?namespace=oclcnum&id=$1   [NC,L]
+RewriteRule ^isbn/(.*)   		index.php?namespace=isbn&id=$1   [NC,L]
+
+# Taxonomic name
+RewriteRule ^names/urn:lsid:organismnames.com:name:(\d+)   		index.php?namespace=names&id=$1   [NC,L]
+
+# Cluster of taxonomic names
+RewriteRule ^names/cluster/(.*)   		index.php?namespace=cluster&id=$1   [NC,L]
+
