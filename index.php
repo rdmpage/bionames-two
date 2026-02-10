@@ -690,7 +690,7 @@ function display_entity_details($doc)
 	{
 		// debug display simplified data
 		echo '<h2>Data</h2>';
-		echo '<div style="font-family:monospace;white-space:pre-wrap;border:1px solid #CCC;padding:1em;">';
+		echo '<div class="debug-data">';
 		echo json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		echo '</div>';
 	}
@@ -796,11 +796,11 @@ echo '
 
 
 #citation-output {
-	display:none; 
-	padding:1em; 
-	background:#f5f5f5; 
-	border:1px solid #ddd; 
-	margin-top:1em; 
+	display:none;
+	padding:1em;
+	background: var(--citation-bg);
+	border: 1px solid var(--citation-border);
+	margin-top:1em;
 	white-space: pre-wrap;
 	word-wrap: break-word;
 	overflow-wrap: break-word;
@@ -813,7 +813,34 @@ echo '
 	overflow-wrap: break-word;
 }
 
+.family {
+	font-variant: small-caps;
+}
+.subfamily {
+	font-variant: small-caps;
+}
+.genericName {
+	font-style: italic;
+}
+.infragenericEpithet {
+	font-style: italic;
+}
+.specificEpithet {
+	font-style: italic;
+}
+.infraspecificEpithet {
+	font-style: italic;
+}
+.unranked {
+	background-color: var(--unranked-bg);
+}
 
+.debug-data {
+	font-family: monospace;
+	white-space: pre-wrap;
+	border: 1px solid var(--border-color);
+	padding: 1em;
+}
 
 ';
 
@@ -1024,7 +1051,7 @@ function display_search($q)
 	// Debug display
 	if (0)
 	{
-		echo '<div style="font-family:monospace;white-space:pre-wrap;border:1px solid black;padding:1em;">';
+		echo '<div class="debug-data">';
 		echo json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		echo '</div>';
 	}

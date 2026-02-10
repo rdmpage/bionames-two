@@ -103,7 +103,7 @@ dl {
 }
 dt {
   text-align:right;
-  /* color:#444; */
+  color: var(--dt-color);
 }
 dd {
   margin: 0;
@@ -124,16 +124,16 @@ dd {
 }
 
 
-button { 
-	font-size:1em; 
+button {
+	font-size:1em;
 
-	background:#3300CC;
-	color:white;
-	border:1px solid #3300CC;
-	
+	background: var(--button-bg);
+	color: var(--button-text);
+	border: 1px solid var(--button-border);
+
 	padding: 0.5em 1em;
 	border-radius: 0.2em;
-	
+
 	-webkit-appearance: none;
 	display: inline-block;
 }
@@ -145,14 +145,14 @@ button {
 
 .error {
 	padding:1em;
-	background-color:red;
-	color: white;
+	background-color: var(--error-bg);
+	color: var(--error-text);
 }
 
 .warning {
 	padding:1em;
-	background-color:orange;
-	color: white;
+	background-color: var(--warning-bg);
+	color: var(--warning-text);
 }
 
 .multicolumn ul {
