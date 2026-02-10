@@ -29,7 +29,14 @@ else
 }
 
 // Database-------------------------------------------------------------------------------
-$config['pdo'] = new PDO('sqlite:bionames-web.db');
+if ($local)
+{
+	$config['pdo'] = new PDO('sqlite:../bionames-sqlite-o/bionames.db');
+}
+else
+{
+	$config['pdo'] = new PDO('sqlite:bionames-web.db');
+}
 
 
 $config['treemap_width']  = 1200;

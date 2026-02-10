@@ -5,8 +5,6 @@ body {
 	font-family: ui-sans-serif, system-ui, sans-serif;
  	background-color: var(--bg);
  	color: var(--text); 
- 	
- 	color:#666; 	
  	font-size:1em;
 }
 
@@ -41,13 +39,13 @@ main {
 	border-radius: 4px;
 	display:inline;
 	font-size:0.8em;
-	background-color:#EEE;
+	background-color:var(--type-bg); 
 }
 
 
 h1, h2 {
 	font-weight: normal;
-	color:#333; 
+	color:var(--text);
 }
 
 h1 {
@@ -67,16 +65,17 @@ li {
 
 a {
     text-decoration: none;
+    color: var(--link-text);
 }
 
 /* If we want an underline when we mouse over the link */
 a:hover {
-	background-color:#DDD;   
+	background-color:var(--link-bg);   
 }	
 
 a.external:hover {
 	text-decoration:underline;
-	background-color:var(--bg);   
+	background-color:var(--link-bg);   
 }	
 
 

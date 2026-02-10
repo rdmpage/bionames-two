@@ -34,8 +34,8 @@
 
 /* cell in treemap */
 .cell {
-	background-color: #eeeeee;
-	border:1px solid rgb(200,200,200);
+	background-color: var(--cell-bg);
+	border:1px solid var(--cell-border);
 	opacity:0.5;
 	position:absolute;
 	overflow:hidden;
@@ -43,7 +43,7 @@
 }
     
 .cell:hover {
-    border:1px solid rgb(192,192,192);
+    border:1px solid var(--cell-hover);
     opacity:1.0;
 }
 
@@ -58,4 +58,8 @@
 .cell a:hover {
 	background-color: transparent;
 }
+
+
+
+
 

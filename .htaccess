@@ -27,6 +27,7 @@ RewriteRule ^search/(.*)   		index.php?q=$1   [NC,L]
 
 # Identifiers
 RewriteRule ^urn:lsid:organismnames.com:name:(\d+)   		index.php?namespace=names&id=$1   [NC,L]
+RewriteRule ^doi/(.*)   		index.php?namespace=doi&id=$1   [NC,L]
 
 
 

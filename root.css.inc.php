@@ -38,6 +38,16 @@
 	--input-bg-focus: white;
 	--input-border-focus: black;
 	--input-focus-color: black;
+	
+	--type-bg: var(--input-bg);
+	
+	--link-bg: green;
+	--link-text: blue;
+	
+	--cell-bg: #eeeeee;
+	--cell-border: rgb(200,200,200);
+	--cell-hover: rgb(192,192,192);
+
 }
 
 @media (prefers-color-scheme: dark) {
@@ -87,6 +97,12 @@
 	--input-bg-focus: rgb(79,70,93);
 	--input-border-focus: white;
 	--input-focus-color: white;
+	
+	--cell-bg: blue;
+	--cell-border: rgb(200,200,200);
+	--cell-hover: rgb(192,192,192);
+	
+
 
   }
 }
