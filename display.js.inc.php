@@ -99,7 +99,8 @@ function drawTreemap(path) {
 					html += '"';
 					html += '>';
 					
-					html += '<a href="?path=' + encodeURIComponent(data[i].id) + '">';
+					//html += '<a href="?path=' + encodeURIComponent(data[i].id) + '">';
+					html += '<a href="path/' + encodeURIComponent(data[i].id) + '">';
 						
 					html += '<span>' + data[i].label + '</span>';
 					

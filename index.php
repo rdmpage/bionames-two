@@ -733,7 +733,7 @@ function display_entity($namespace, $id)
 	
 	$title = entity_name($doc[0]);
 	
- 	display_html_start($title);
+ 	display_html_start($title, $doc);
 	display_navbar('');	
 	display_main_start();
 	
@@ -745,7 +745,7 @@ function display_entity($namespace, $id)
 
 //----------------------------------------------------------------------------------------
 // Start of HTML document
-function display_html_start($title = '')
+function display_html_start($title = '', $entity = null)
 {
 	global $config;
 	
@@ -844,7 +844,15 @@ echo '
 
 ';
 
-	echo '</style>' . "\n";	
+	echo '</style>' . "\n";		
+	
+	if ($entity)
+	{
+		echo "<!-- JSON-LD -->\n";
+		echo '<script type="application/ld+json">' . "\n";	
+		echo json_encode($entity, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		echo '</script>' . "\n";	
+	}
 
 	echo '</head>';
 	echo '<body>';
@@ -879,6 +887,7 @@ function display_navbar($q)
 				<input type="submit" value="Search">
 			</form>
 		</li>
+		<li><a href="path/k__Animalia">Classification</a></li>
 		<li><a href="?containers">Containers</a></li>
 		<li><a href="https://github.com/rdmpage/bionames-two/issues" target="_new">Feedback</a></li>
 	</ul>
@@ -908,7 +917,7 @@ function display_search($q)
 
 	$results = search($q);
 
-	display_html_start($title);
+	display_html_start($title, $results);
 	display_navbar($q);
 	display_main_start();
 	
@@ -1141,6 +1150,23 @@ function default_display($error_msg = '')
 		echo '<div class="headline">';
 
 		echo '<h1>Welcome to BioNames</h1>';
+		
+		echo '<h2>Goal</h2>';
+		
+		
+		echo '<p>BioNames is a passion project to link every published scientific name 
+		for an animal to its original description, ideally using a
+		<a class="external" href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifier (DOI)</a>.
+		The animal names come from the <a class="external" href="http://www.organismnames.com">Index to Organism Names (ION)</a>
+		which provides <a class="external" href="https://en.wikipedia.org/wiki/LSID">Life Science Identifiers (LSID)</a> for names
+		and a simple bibliographic citation. BioNames extracts those citations, parses them, and
+		attempts to match them to DOIs, links to PDFs, or any other persistent identifier. If the PDF is freely accessible
+		the PDF is displayed on BioNames. </p>';		
+		
+		echo '<p>For background on the project see "BioNames: linking taxonomy, texts, and trees" (<a class="external" href="https://doi.org/10.7717/peerj.190">https://doi.org/10.7717/peerj.190</a>)
+		and "Ten years and a million links: building a global taxonomic library connecting persistent identifiers for names, publications and people" (<a class="external" href="https://doi.org/BDJ.11.e107914">https://doi.org/BDJ.11.e107914</a>).
+		</p>';
+		
 
 		echo '<h2>Database Statistics</h2>';
 		echo '<dl>';
