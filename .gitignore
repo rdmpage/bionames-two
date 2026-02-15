@@ -4,3 +4,4 @@ bionames.db
 /junk/
 /vendor/
 .phpunit.result.cache
+bionames-web.db
