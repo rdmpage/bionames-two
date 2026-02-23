@@ -770,7 +770,8 @@ function display_html_start($title = '', $entity = null)
 </script>";
 
 	echo '<meta charset="utf-8">';
-	
+	echo '<meta name="viewport" content="width=device-width, initial-scale=1">';
+
 	echo '<!-- base -->
     	<base href="' . $config['web_root'] . '" /><!--[if IE]></base><![endif]-->' . "\n";
     
@@ -888,8 +889,8 @@ function display_navbar($q)
 	echo '<nav>
 	<ul>
 		<li><a href=".">Home</a></li>
-		<li>
-			<form method="get" action="index.php" style="display:inline;">
+		<li class="search-item">
+			<form method="get" action="index.php">
 				<input class="search" id="search" name="q" type="text" placeholder="Search for name..." value="' . htmlspecialchars($q) . '">
 				<input type="submit" value="Search">
 			</form>

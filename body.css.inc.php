@@ -10,27 +10,26 @@ body {
 
 /* main column */
 main {
-	/*width:90vw;
-	padding:1em;*/
-	padding:0px;
-	width100vw;
-	margin:auto;
+	padding: 0 5vw;
+	box-sizing: border-box;
+	width: 100%;
+	margin: auto;
+	max-width: 1200px;
+}
+
+@media (max-width: 600px) {
+	main {
+		padding: 0 0.8em;
+	}
 }
 
 .headline {
-	width:90vw;
-	margin:auto;
 	margin-bottom: 1em;
-	padding-top:1em;
-	
-	/* border:1px solid #CCC; */
+	padding-top: 1em;
 }
 
 .relationships {
-	width:90vw;
-	margin:auto;
-	
-	/* border:1px solid #CCC; */
+	margin-top: 1em;
 }
 
 .type {
@@ -173,7 +172,7 @@ button {
 }	
 
 #pdf {
-	border-top:1px solid #CCC;
+	border-top: 1px solid var(--border-color);
 }
 
 .citation {
