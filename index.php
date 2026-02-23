@@ -172,7 +172,7 @@ function display_classification_breadcrumbs($higherClassification)
 
 	if ($image != '')
 	{
-		echo '<img style="opacity:0.6" height="60" src="' . $image . '">';
+		echo '<img class="silhouette" height="60" src="' . $image . '">';
 	}
 
 	echo '<div>';
