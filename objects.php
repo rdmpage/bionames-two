@@ -985,35 +985,63 @@ function get_cluster($cluster_id)
 }
 
 //----------------------------------------------------------------------------------------
+// Get a single database statistic by name
+function get_database_stat($stat)
+{
+	$obj = new stdclass;
+	$obj->stat = $stat;
+	$obj->value = null;
+
+	switch ($stat)
+	{
+		case 'total_names':
+			$sql = "SELECT COUNT(*) as count FROM names";
+			$data = db_get($sql);
+			$obj->value = (int)$data[0]->count;
+			break;
+
+		case 'total_clusters':
+			$sql = "SELECT COUNT(DISTINCT cluster_id) as count FROM names WHERE cluster_id IS NOT NULL";
+			$data = db_get($sql);
+			$obj->value = (int)$data[0]->count;
+			break;
+
+		case 'names_with_dois':
+			$sql = "SELECT COUNT(*) as count FROM names WHERE doi IS NOT NULL AND doi != ''";
+			$data = db_get($sql);
+			$obj->value = (int)$data[0]->count;
+			break;
+
+		case 'names_with_content_sha1':
+			$sql = "SELECT COUNT(*) as count FROM names WHERE content_sha1 IS NOT NULL";
+			$data = db_get($sql);
+			$obj->value = (int)$data[0]->count;
+			break;
+
+		case 'names_with_publications':
+			$sql = "SELECT COUNT(*) as count FROM names WHERE publication IS NOT NULL";
+			$data = db_get($sql);
+			$obj->value = (int)$data[0]->count;
+			break;
+
+		default:
+			break;
+	}
+
+	return $obj;
+}
+
+//----------------------------------------------------------------------------------------
 // Get database statistics for home page
 function get_database_stats()
 {
 	$stats = new stdclass;
 
-	// Total number of names
-	$sql = "SELECT COUNT(*) as count FROM names";
-	$data = db_get($sql);
-	$stats->total_names = $data[0]->count;
-
-	// Total number of distinct clusters
-	$sql = "SELECT COUNT(DISTINCT cluster_id) as count FROM names WHERE cluster_id IS NOT NULL";
-	$data = db_get($sql);
-	$stats->total_clusters = $data[0]->count;
-
-	// Number of names with DOIs
-	$sql = "SELECT COUNT(*) as count FROM names WHERE doi IS NOT NULL AND doi != ''";
-	$data = db_get($sql);
-	$stats->names_with_dois = $data[0]->count;
-	
-	// Number of names with content (freely viewable PDFs)
-	$sql = "SELECT COUNT(*) as count FROM names WHERE content_sha1 IS NOT NULL";
-	$data = db_get($sql);
-	$stats->names_with_content_sha1 = $data[0]->count;
-
-	// Number of names with a publication
-	$sql = "SELECT COUNT(*) as count FROM names WHERE publication IS NOT NULL";
-	$data = db_get($sql);
-	$stats->names_with_publications = $data[0]->count;
+	$stats->total_names           = get_database_stat('total_names')->value;
+	$stats->total_clusters        = get_database_stat('total_clusters')->value;
+	$stats->names_with_dois       = get_database_stat('names_with_dois')->value;
+	$stats->names_with_content_sha1 = get_database_stat('names_with_content_sha1')->value;
+	$stats->names_with_publications = get_database_stat('names_with_publications')->value;
 
 	return $stats;
 }

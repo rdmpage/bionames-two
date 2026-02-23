@@ -88,6 +88,14 @@ function api_display_treemap ($path, $callback = '')
 
 
 //--------------------------------------------------------------------------------------------------
+// Single database statistic
+function api_display_stat($stat, $callback = '')
+{
+	$obj = get_database_stat($stat);
+	api_output($obj, $callback, 200);
+}
+
+//--------------------------------------------------------------------------------------------------
 function api_main()
 {
 	global $config;
@@ -168,14 +176,25 @@ function api_main()
 	if (!$handled)
 	{
 		if (isset($_GET['path']))
-		{	
+		{
 			$path = $_GET['path'];
-			
+
 			api_display_treemap($path, $callback);
 			$handled = true;
 		}
-	}	
-	
+	}
+
+	if (!$handled)
+	{
+		if (isset($_GET['stat']))
+		{
+			$stat = $_GET['stat'];
+
+			api_display_stat($stat, $callback);
+			$handled = true;
+		}
+	}
+
 	if (!$handled)
 	{
 		api_default_display();

@@ -1151,50 +1151,55 @@ function default_display($error_msg = '')
 	}
 	else
 	{
-		// Get database statistics
-		$stats = get_database_stats();
-		
 		echo '<div class="headline">';
 
 		echo '<h1>Welcome to BioNames</h1>';
-		
+
 		echo '<h2>Goal</h2>';
-		
-		
-		echo '<p>BioNames is a passion project to link every published scientific name 
+
+		echo '<p>BioNames is a passion project to link every published scientific name
 		for an animal to its original description, ideally using a
 		<a class="external" href="https://en.wikipedia.org/wiki/Digital_object_identifier">Digital object identifier (DOI)</a>.
 		The animal names come from the <a class="external" href="http://www.organismnames.com">Index to Organism Names (ION)</a>
 		which provides <a class="external" href="https://en.wikipedia.org/wiki/LSID">Life Science Identifiers (LSID)</a> for names
 		and a simple bibliographic citation. BioNames extracts those citations, parses them, and
 		attempts to match them to DOIs, links to PDFs, or any other persistent identifier. If the PDF is freely accessible
-		the PDF is displayed on BioNames. </p>';		
-		
+		the PDF is displayed on BioNames. </p>';
+
 		echo '<p>For background on the project see "BioNames: linking taxonomy, texts, and trees" (<a class="external" href="https://doi.org/10.7717/peerj.190">https://doi.org/10.7717/peerj.190</a>)
 		and "Ten years and a million links: building a global taxonomic library connecting persistent identifiers for names, publications and people" (<a class="external" href="https://doi.org/BDJ.11.e107914">https://doi.org/BDJ.11.e107914</a>).
 		</p>';
-		
 
 		echo '<h2>Database Statistics</h2>';
 		echo '<dl>';
-		
 		echo '<dt>Total names</dt>';
-		echo '<dd>' . number_format($stats->total_names) . '</dd>';
-
+		echo '<dd id="stat-total_names">...</dd>';
 		echo '<dt>Distinct name clusters</dt>';
-		echo '<dd>' . number_format($stats->total_clusters) . '</dd>';
-
+		echo '<dd id="stat-total_clusters">...</dd>';
 		echo '<dt>Names with publications</dt>';
-		echo '<dd>' . number_format($stats->names_with_publications) . '</dd>';
-
+		echo '<dd id="stat-names_with_publications">...</dd>';
 		echo '<dt>Names with DOIs</dt>';
-		echo '<dd>' . number_format($stats->names_with_dois) . '</dd>';
-
+		echo '<dd id="stat-names_with_dois">...</dd>';
 		echo '<dt>Names with free PDFs</dt>';
-		echo '<dd>' . number_format($stats->names_with_content_sha1) . '</dd>';
-		
+		echo '<dd id="stat-names_with_content_sha1">...</dd>';
 		echo '</dl>';
-		
+
+		// Fetch each stat individually so slow queries don't block fast ones
+		$stats = ['total_names', 'total_clusters', 'names_with_publications', 'names_with_dois', 'names_with_content_sha1'];
+		echo '<script>';
+		foreach ($stats as $stat)
+		{
+			echo '
+fetch("' . $config['web_root'] . 'api.php?stat=' . $stat . '")
+  .then(r => r.json())
+  .then(data => {
+    var el = document.getElementById("stat-' . $stat . '");
+    if (el) el.textContent = data.value.toLocaleString();
+  });
+';
+		}
+		echo '</script>';
+
 		echo '</div>';
 	}
 
