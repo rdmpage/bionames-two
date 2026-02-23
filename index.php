@@ -1171,7 +1171,7 @@ function default_display($error_msg = '')
 		</p>';
 
 		echo '<h2>Database Statistics</h2>';
-		echo '<dl>';
+		echo '<dl class="stats">';
 		echo '<dt>Total names</dt>';
 		echo '<dd id="stat-total_names">...</dd>';
 		echo '<dt>Distinct name clusters</dt>';

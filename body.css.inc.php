@@ -108,7 +108,11 @@ dd {
   margin: 0;
   grid-column-start: 2;
   /* font-weight: bold; */
-}  
+}
+
+dl.stats dd {
+  text-align: right;
+}
 
 .search {
 	border:1px solid var(--input-border);
