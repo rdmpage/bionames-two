@@ -71,46 +71,37 @@ function show_citation(cslJsonText, format) {
 //----------------------------------------------------------------------------------------
 function drawTreemap(path) {
 	var url = 'api.php?path=' + encodeURIComponent(path);
-	
+
 	fetch(url).then(
 		function(response){
 			if (response.status != 200) {
 				console.log("Looks like there was a problem. Status Code: " + response.status);
 				return;
 			}
-	
+
 			response.json().then(function(data) {
 				var html = '';
 				for (var i in data) {
+					var image_url = 'images/' + data[i].label + '.svg';
+
 					html += '<div class="cell"'
-						+ ' style="' 
+						+ ' style="'
 						+ 'top:calc(' + data[i].bounds.y + ' / var(--h) * 100%);'
 						+ 'left:calc(' + data[i].bounds.x + ' / var(--w) * 100%);'
 						+ 'width:calc(' + data[i].bounds.w + ' / var(--w) * 100%);'
 						+ 'height:calc(' + data[i].bounds.h + ' / var(--h) * 100%);'
-						
-					var image_url = 'images/' + data[i].label + '.svg';
-					
-					html += 'background-image:url(\'' + image_url + '\');';
-					html += 'background-repeat:no-repeat;';
-					html += 'background-position:center;';
-					html += 'background-size: 50%;';
-													
-					html += '"';
-					html += '>';
-					
-					//html += '<a href="?path=' + encodeURIComponent(data[i].id) + '">';
+						+ '">';
+
 					html += '<a href="path/' + encodeURIComponent(data[i].id) + '">';
-						
+					html += '<img class="silhouette" src="' + image_url + '">';
 					html += '<span>' + data[i].label + '</span>';
-					
-					html += '</a>';	
-					
+					html += '</a>';
+
 					html += '</div>';
 				}
 				if (html != '') {
 					document.getElementById("treemap").innerHTML = html;
-					document.getElementById("treemap").style.display = "block"; 
+					document.getElementById("treemap").style.display = "block";
 				}
 			});
 		});

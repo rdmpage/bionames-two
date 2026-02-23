@@ -48,6 +48,9 @@
 	--cell-border: rgb(200,200,200);
 	--cell-hover: rgb(192,192,192);
 
+	/* silhouette images - no filter needed in light mode */
+	--silhouette-filter: none;
+
 }
 
 @media (prefers-color-scheme: dark) {
@@ -101,6 +104,9 @@
 	--cell-bg: blue;
 	--cell-border: rgb(200,200,200);
 	--cell-hover: rgb(192,192,192);
+
+	/* invert black silhouettes to white in dark mode */
+	--silhouette-filter: invert(1);
 	
 
 

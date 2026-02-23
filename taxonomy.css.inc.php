@@ -41,7 +41,7 @@
 	overflow:hidden;
 	text-align:center;
 }
-    
+
 .cell:hover {
     border:1px solid var(--cell-hover);
     opacity:1.0;
@@ -52,11 +52,29 @@
 	display: block;
 	width: 100%;
 	height: 100%;
+	position: relative;
 }
 
 /* override default display for internal links, otherwise we hide the image in the cell */
 .cell a:hover {
 	background-color: transparent;
+}
+
+/* silhouette image inside treemap cell */
+.cell a img.silhouette {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 50%;
+	height: 50%;
+	object-fit: contain;
+}
+
+/* silhouette images - colour adapts to light/dark mode */
+img.silhouette {
+	opacity: 0.6;
+	filter: var(--silhouette-filter);
 }
 
 
