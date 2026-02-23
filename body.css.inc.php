@@ -109,6 +109,10 @@ dd {
   /* font-weight: bold; */
 }
 
+dl.stats {
+  width: fit-content;
+}
+
 dl.stats dd {
   text-align: right;
 }
