@@ -124,6 +124,7 @@ function get_entity($namespace, $id)
 
 		case 'issn':
 		case 'oclc':
+		case 'isbn':
 			$doc = get_container($namespace, $id);
 			$entity[] = $doc;
 

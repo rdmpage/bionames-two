@@ -4,7 +4,7 @@
 <dict>
 	<key>EmbeddedEditorHidden:rpage</key>
 	<false/>
-	<key>ExpandedEditorWidth:rpage:displays([(0, 0), (3440, 1440)])</key>
+	<key>ExpandedEditorWidth:rpage:displays([(0, 0), (1512, 982)])</key>
 	<integer>975</integer>
 	<key>ExpandedItems:rpage</key>
 	<array>
@@ -16,42 +16,6 @@
 	<integer>0</integer>
 	<key>OpenDocuments:rpage</key>
 	<array>
-		<dict>
-			<key>BookmarkData</key>
-			<data>
-			Ym9vayADAAAAAAQQMAAAAPd+ViWc+gLehdI4ukMlc9vj3Fx64nEK
-			YvmbbVM3EnUcEAIAAAQAAAADAwAAAAgAKAUAAAABAQAAVXNlcnMA
-			AAAFAAAAAQEAAHJwYWdlAAAABQAAAAEBAABTaXRlcwAAAAwAAAAB
-			AQAAYmlvbmFtZXMtdHdvCQAAAAEBAAAuaHRhY2Nlc3MAAAAUAAAA
-			AQYAABAAAAAgAAAAMAAAAEAAAABUAAAACAAAAAQDAACEXAAAAAAA
-			AAgAAAAEAwAAlsYDAAAAAAAIAAAABAMAAEDoHgAAAAAACAAAAAQD
-			AADcbur0AAAAAAgAAAAEAwAAMSwq9QAAAAAUAAAAAQYAAIQAAACU
-			AAAApAAAALQAAADEAAAACAAAAAAEAABBx52KzZ0fchgAAAABAgAA
-			AQAAAAAAAAAPAAAAAAAAAAAAAAAAAAAACAAAAAQDAAADAAAAAAAA
-			AAQAAAADAwAA9QEAAAgAAAABCQAAZmlsZTovLy8MAAAAAQEAAE1h
-			Y2ludG9zaCBIRAgAAAAEAwAAAJCClucAAAAIAAAAAAQAAEHGd57a
-			gAAAJAAAAAEBAABFRURCQzQ5NS1ERjUyLTQ1NkEtQjQzMS1GQjYw
-			N0JGMDRBRDEYAAAAAQIAAIEAAAABAAAA7xMAAAEAAAAAAAAAAAAA
-			AAEAAAABAQAALwAAAAAAAAABBQAAGgAAAAEBAABOU1VSTERvY3Vt
-			ZW50SWRlbnRpZmllcktleQAABAAAAAMDAACIszQA2AAAAP7///8B
-			AAAAAAAAABEAAAAEEAAAaAAAAAAAAAAFEAAA1AAAAAAAAAAQEAAA
-			AAEAAAAAAABAEAAA8AAAAAAAAAACIAAAzAEAAAAAAAAFIAAAPAEA
-			AAAAAAAQIAAATAEAAAAAAAARIAAAgAEAAAAAAAASIAAAYAEAAAAA
-			AAATIAAAcAEAAAAAAAAgIAAArAEAAAAAAAAwIAAA2AEAAAAAAAAB
-			wAAAIAEAAAAAAAARwAAAIAAAAAAAAAASwAAAMAEAAAAAAAAQ0AAA
-			BAAAAAAAAADgAQCABAIAAAAAAAA=
-			</data>
-			<key>FileURL</key>
-			<string>file:///Users/rpage/Sites/bionames-two/.htaccess</string>
-			<key>HasSecurityScope</key>
-			<true/>
-			<key>RelativePath</key>
-			<string>./.htaccess</string>
-			<key>TypeID</key>
-			<string>_CFileLocator</string>
-			<key>Version</key>
-			<integer>1</integer>
-		</dict>
 		<dict>
 			<key>BookmarkData</key>
 			<data>
@@ -197,6 +161,78 @@
 		<dict>
 			<key>BookmarkData</key>
 			<data>
+			Ym9vayADAAAAAAQQMAAAAPd+ViWc+gLehdI4ukMlc9vj3Fx64nEK
+			YvmbbVM3EnUcEAIAAAQAAAADAwAAAAgAKAUAAAABAQAAVXNlcnMA
+			AAAFAAAAAQEAAHJwYWdlAAAABQAAAAEBAABTaXRlcwAAAAwAAAAB
+			AQAAYmlvbmFtZXMtdHdvCQAAAAEBAAAuaHRhY2Nlc3MAAAAUAAAA
+			AQYAABAAAAAgAAAAMAAAAEAAAABUAAAACAAAAAQDAACEXAAAAAAA
+			AAgAAAAEAwAAlsYDAAAAAAAIAAAABAMAAEDoHgAAAAAACAAAAAQD
+			AADcbur0AAAAAAgAAAAEAwAAMSwq9QAAAAAUAAAAAQYAAIQAAACU
+			AAAApAAAALQAAADEAAAACAAAAAAEAABBx52KzZ0fchgAAAABAgAA
+			AQAAAAAAAAAPAAAAAAAAAAAAAAAAAAAACAAAAAQDAAADAAAAAAAA
+			AAQAAAADAwAA9QEAAAgAAAABCQAAZmlsZTovLy8MAAAAAQEAAE1h
+			Y2ludG9zaCBIRAgAAAAEAwAAAJCClucAAAAIAAAAAAQAAEHGd57a
+			gAAAJAAAAAEBAABFRURCQzQ5NS1ERjUyLTQ1NkEtQjQzMS1GQjYw
+			N0JGMDRBRDEYAAAAAQIAAIEAAAABAAAA7xMAAAEAAAAAAAAAAAAA
+			AAEAAAABAQAALwAAAAAAAAABBQAAGgAAAAEBAABOU1VSTERvY3Vt
+			ZW50SWRlbnRpZmllcktleQAABAAAAAMDAACIszQA2AAAAP7///8B
+			AAAAAAAAABEAAAAEEAAAaAAAAAAAAAAFEAAA1AAAAAAAAAAQEAAA
+			AAEAAAAAAABAEAAA8AAAAAAAAAACIAAAzAEAAAAAAAAFIAAAPAEA
+			AAAAAAAQIAAATAEAAAAAAAARIAAAgAEAAAAAAAASIAAAYAEAAAAA
+			AAATIAAAcAEAAAAAAAAgIAAArAEAAAAAAAAwIAAA2AEAAAAAAAAB
+			wAAAIAEAAAAAAAARwAAAIAAAAAAAAAASwAAAMAEAAAAAAAAQ0AAA
+			BAAAAAAAAADgAQCABAIAAAAAAAA=
+			</data>
+			<key>FileURL</key>
+			<string>file:///Users/rpage/Sites/bionames-two/.htaccess</string>
+			<key>HasSecurityScope</key>
+			<true/>
+			<key>RelativePath</key>
+			<string>./.htaccess</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>BookmarkData</key>
+			<data>
+			Ym9vayQDAAAAAAQQMAAAAIndTuNQFBWinU/zobnjSjCqOsUWgPkI
+			ETU9yxOlmGRKFAIAAAQAAAADAwAAAAgAKAUAAAABAQAAVXNlcnMA
+			AAAFAAAAAQEAAHJwYWdlAAAABQAAAAEBAABTaXRlcwAAAAwAAAAB
+			AQAAYmlvbmFtZXMtdHdvDgAAAAEBAABjb25maWcuaW5jLnBocAAA
+			FAAAAAEGAAAQAAAAIAAAADAAAABAAAAAVAAAAAgAAAAEAwAAhFwA
+			AAAAAAAIAAAABAMAAJbGAwAAAAAACAAAAAQDAABA6B4AAAAAAAgA
+			AAAEAwAA3G7q9AAAAAAIAAAABAMAADIsKvUAAAAAFAAAAAEGAACI
+			AAAAmAAAAKgAAAC4AAAAyAAAAAgAAAAABAAAQcedis2dNkwYAAAA
+			AQIAAAEAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAgAAAAEAwAAAwAA
+			AAAAAAAEAAAAAwMAAPUBAAAIAAAAAQkAAGZpbGU6Ly8vDAAAAAEB
+			AABNYWNpbnRvc2ggSEQIAAAABAMAAACQgpbnAAAACAAAAAAEAABB
+			xnee2oAAACQAAAABAQAARUVEQkM0OTUtREY1Mi00NTZBLUI0MzEt
+			RkI2MDdCRjA0QUQxGAAAAAECAACBAAAAAQAAAO8TAAABAAAAAAAA
+			AAAAAAABAAAAAQEAAC8AAAAAAAAAAQUAABoAAAABAQAATlNVUkxE
+			b2N1bWVudElkZW50aWZpZXJLZXkAAAQAAAADAwAAu7I0ANgAAAD+
+			////AQAAAAAAAAARAAAABBAAAGwAAAAAAAAABRAAANgAAAAAAAAA
+			EBAAAAQBAAAAAAAAQBAAAPQAAAAAAAAAAiAAANABAAAAAAAABSAA
+			AEABAAAAAAAAECAAAFABAAAAAAAAESAAAIQBAAAAAAAAEiAAAGQB
+			AAAAAAAAEyAAAHQBAAAAAAAAICAAALABAAAAAAAAMCAAANwBAAAA
+			AAAAAcAAACQBAAAAAAAAEcAAACAAAAAAAAAAEsAAADQBAAAAAAAA
+			ENAAAAQAAAAAAAAA5AEAgAgCAAAAAAAA
+			</data>
+			<key>FileURL</key>
+			<string>file:///Users/rpage/Sites/bionames-two/config.inc.php</string>
+			<key>HasSecurityScope</key>
+			<true/>
+			<key>RelativePath</key>
+			<string>./config.inc.php</string>
+			<key>TypeID</key>
+			<string>_CFileLocator</string>
+			<key>Version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>BookmarkData</key>
+			<data>
 			Ym9vayADAAAAAAQQMAAAAMl0bBs1vQYJscz9g/w0xxuDh7TTCDtB
 			Px17uOb/cxuhEAIAAAQAAAADAwAAAAgAKAUAAAABAQAAVXNlcnMA
 			AAAFAAAAAQEAAHJwYWdlAAAABQAAAAEBAABTaXRlcwAAAAwAAAAB
@@ -234,7 +270,7 @@
 	<key>OpenDocumentsExpanded</key>
 	<true/>
 	<key>OpenDocumentsSplitterProportion</key>
-	<real>0.77023255813953484</real>
+	<real>0.90393013100436681</real>
 	<key>ProjectItemsExpanded</key>
 	<true/>
 	<key>ProjectViewVisible</key>
@@ -243,7 +279,50 @@
 	<array>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
+			<key>Location</key>
+			<dict>
+				<key>BookmarkData</key>
+				<data>
+				Ym9vayQDAAAAAAQQMAAAAIndTuNQFBWinU/zobnjSjCq
+				OsUWgPkIETU9yxOlmGRKFAIAAAQAAAADAwAAAAgAKAUA
+				AAABAQAAVXNlcnMAAAAFAAAAAQEAAHJwYWdlAAAABQAA
+				AAEBAABTaXRlcwAAAAwAAAABAQAAYmlvbmFtZXMtdHdv
+				DgAAAAEBAABjb25maWcuaW5jLnBocAAAFAAAAAEGAAAQ
+				AAAAIAAAADAAAABAAAAAVAAAAAgAAAAEAwAAhFwAAAAA
+				AAAIAAAABAMAAJbGAwAAAAAACAAAAAQDAABA6B4AAAAA
+				AAgAAAAEAwAA3G7q9AAAAAAIAAAABAMAADIsKvUAAAAA
+				FAAAAAEGAACIAAAAmAAAAKgAAAC4AAAAyAAAAAgAAAAA
+				BAAAQcedis2dNkwYAAAAAQIAAAEAAAAAAAAADwAAAAAA
+				AAAAAAAAAAAAAAgAAAAEAwAAAwAAAAAAAAAEAAAAAwMA
+				APUBAAAIAAAAAQkAAGZpbGU6Ly8vDAAAAAEBAABNYWNp
+				bnRvc2ggSEQIAAAABAMAAACQgpbnAAAACAAAAAAEAABB
+				xnee2oAAACQAAAABAQAARUVEQkM0OTUtREY1Mi00NTZB
+				LUI0MzEtRkI2MDdCRjA0QUQxGAAAAAECAACBAAAAAQAA
+				AO8TAAABAAAAAAAAAAAAAAABAAAAAQEAAC8AAAAAAAAA
+				AQUAABoAAAABAQAATlNVUkxEb2N1bWVudElkZW50aWZp
+				ZXJLZXkAAAQAAAADAwAAu7I0ANgAAAD+////AQAAAAAA
+				AAARAAAABBAAAGwAAAAAAAAABRAAANgAAAAAAAAAEBAA
+				AAQBAAAAAAAAQBAAAPQAAAAAAAAAAiAAANABAAAAAAAA
+				BSAAAEABAAAAAAAAECAAAFABAAAAAAAAESAAAIQBAAAA
+				AAAAEiAAAGQBAAAAAAAAEyAAAHQBAAAAAAAAICAAALAB
+				AAAAAAAAMCAAANwBAAAAAAAAAcAAACQBAAAAAAAAEcAA
+				ACAAAAAAAAAAEsAAADQBAAAAAAAAENAAAAQAAAAAAAAA
+				5AEAgAgCAAAAAAAA
+				</data>
+				<key>FileURL</key>
+				<string>file:///Users/rpage/Sites/bionames-two/config.inc.php</string>
+				<key>HasSecurityScope</key>
+				<true/>
+				<key>TypeID</key>
+				<string>_CFileLocator</string>
+				<key>Version</key>
+				<integer>1</integer>
+			</dict>
+		</dict>
+		<dict>
+			<key>Date</key>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -286,7 +365,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -329,7 +408,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -372,7 +451,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -413,7 +492,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -456,7 +535,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -499,7 +578,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -542,7 +621,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -585,7 +664,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -626,7 +705,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -667,7 +746,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -710,7 +789,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -753,7 +832,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -795,7 +874,7 @@
 		</dict>
 		<dict>
 			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
+			<date>2026-02-23T17:05:55Z</date>
 			<key>Location</key>
 			<dict>
 				<key>BookmarkData</key>
@@ -834,51 +913,6 @@
 				<integer>1</integer>
 			</dict>
 		</dict>
-		<dict>
-			<key>Date</key>
-			<date>2026-02-15T14:29:07Z</date>
-			<key>Location</key>
-			<dict>
-				<key>BookmarkData</key>
-				<data>
-				Ym9va2wDAAAAAAQQMAAAAA2eJT6rywOUgGt+fINDD4hw
-				0WS61kj3BSLhe494f1XRXAIAAAQAAAADAwAAAAgAKAUA
-				AAABAQAAVXNlcnMAAAAFAAAAAQEAAHJwYWdlAAAABQAA
-				AAEBAABTaXRlcwAAAAwAAAABAQAAYmlvbmFtZXMtdHdv
-				BQAAAAEBAABwZGZqcwAAAAMAAAABAQAAd2ViAAoAAAAB
-				AQAAdmlld2VyLmNzcwAAHAAAAAEGAAAQAAAAIAAAADAA
-				AABAAAAAVAAAAGQAAABwAAAACAAAAAQDAACEXAAAAAAA
-				AAgAAAAEAwAAlsYDAAAAAAAIAAAABAMAAEDoHgAAAAAA
-				CAAAAAQDAADcbur0AAAAAAgAAAAEAwAAr2/q9AAAAAAI
-				AAAABAMAALRv6vQAAAAACAAAAAQDAABPpOr0AAAAABwA
-				AAABBgAAqAAAALgAAADIAAAA2AAAAOgAAAD4AAAACAEA
-				AAgAAAAABAAAQceP/wX6idEYAAAAAQIAAAEAAAAAAAAA
-				DwAAAAAAAAAAAAAAAAAAAAgAAAAEAwAABQAAAAAAAAAE
-				AAAAAwMAAPUBAAAIAAAAAQkAAGZpbGU6Ly8vDAAAAAEB
-				AABNYWNpbnRvc2ggSEQIAAAABAMAAACQgpbnAAAACAAA
-				AAAEAABBxnee2oAAACQAAAABAQAARUVEQkM0OTUtREY1
-				Mi00NTZBLUI0MzEtRkI2MDdCRjA0QUQxGAAAAAECAACB
-				AAAAAQAAAO8TAAABAAAAAAAAAAAAAAABAAAAAQEAAC8A
-				AAAAAAAAAQUAABoAAAABAQAATlNVUkxEb2N1bWVudElk
-				ZW50aWZpZXJLZXkAAAQAAAADAwAAwLI0ANgAAAD+////
-				AQAAAAAAAAARAAAABBAAAIQAAAAAAAAABRAAABgBAAAA
-				AAAAEBAAAEwBAAAAAAAAQBAAADwBAAAAAAAAAiAAABgC
-				AAAAAAAABSAAAIgBAAAAAAAAECAAAJgBAAAAAAAAESAA
-				AMwBAAAAAAAAEiAAAKwBAAAAAAAAEyAAALwBAAAAAAAA
-				ICAAAPgBAAAAAAAAMCAAACQCAAAAAAAAAcAAAGwBAAAA
-				AAAAEcAAACAAAAAAAAAAEsAAAHwBAAAAAAAAENAAAAQA
-				AAAAAAAALAIAgFACAAAAAAAA
-				</data>
-				<key>FileURL</key>
-				<string>file:///Users/rpage/Sites/bionames-two/pdfjs/web/viewer.css</string>
-				<key>HasSecurityScope</key>
-				<true/>
-				<key>TypeID</key>
-				<string>_CFileLocator</string>
-				<key>Version</key>
-				<integer>1</integer>
-			</dict>
-		</dict>
 	</array>
 	<key>ScratchpadItemsExpanded</key>
 	<true/>
@@ -890,7 +924,7 @@
 	<false/>
 	<key>ViewSplitterPosition:rpage</key>
 	<real>0.1723259836435318</real>
-	<key>WindowFrame:rpage:displays([(0, 0), (3440, 1440)])</key>
-	<string>rect(237,1255,1312,2433)</string>
+	<key>WindowFrame:rpage:displays([(0, 0), (1512, 982)])</key>
+	<string>rect(66,223,982,1401)</string>
 </dict>
 </plist>

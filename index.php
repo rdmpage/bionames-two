@@ -104,6 +104,11 @@ function id_to_key_value($id)
 		$kv = [$m[1], $m[2]];
 	}
 	
+	if (preg_match('/(isbn):(\d{9,12}[0-9X])/', $id, $m))
+	{
+		$kv = [$m[1], $m[2]];
+	}
+	
 	if (preg_match('/(oclc)\/(\d+)$/', $id, $m))
 	{
 		$kv = [$m[1], $m[2]];
@@ -608,6 +613,8 @@ function display_entity_details($doc)
 				if ($link_id != '')
 				{			
 					$ns_id = id_to_key_value($link_id);
+					
+					echo $link_id;
 					
 					echo '<div>';
 					echo '<p>Is part of ';

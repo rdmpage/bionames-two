@@ -511,6 +511,10 @@ function get_container($namespace, $id)
 			$sql .= ' oclc="' . $id . '"';
 			break;
 			
+		case 'isbn':
+			$sql .= ' isbn="' . $id . '"';
+			break;			
+			
 		case 'issn':
 		default:
 			$sql .= ' issn="' . $id . '"';
@@ -602,6 +606,10 @@ function get_container_works_list($namespace, $id)
 		case 'oclc':
 		case 'oclcnum':
 			$sql .= ' WHERE oclc="' . $id . '"';
+			break;
+
+		case 'isbn':
+			$sql .= ' WHERE isbn="' . $id . '"';
 			break;
 	
 		case 'issn':
