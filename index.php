@@ -640,11 +640,7 @@ function display_entity_details($doc)
 	echo '</div> <!-- headline -->';
 	
 	
-	// PDF
-	if (in_array($main_entity->type, ['Book','Chapter','CreativeWork','ScholarlyArticle']))		
-	{
-		echo '<div id="pdf" style="display:none;"></div>';
-	}
+	// PDF div is output outside <main> so it can fill the full browser width
 	
 	// Entity connections
 	
@@ -745,9 +741,13 @@ function display_entity($namespace, $id)
 	display_main_start();
 	
 	display_entity_details($doc);
-	
+
 	display_main_end();
-	display_html_end();	
+
+	// PDF viewer outside <main> so it fills full browser width
+	echo '<div id="pdf" style="display:none;"></div>';
+
+	display_html_end();
 }
 
 //----------------------------------------------------------------------------------------
