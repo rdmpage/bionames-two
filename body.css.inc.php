@@ -10,25 +10,21 @@ body {
 
 /* main column */
 main {
-	padding: 0 5vw;
-	box-sizing: border-box;
+	padding: 0;
 	width: 100%;
 	margin: auto;
-	max-width: 1200px;
-}
-
-@media (max-width: 600px) {
-	main {
-		padding: 0 0.8em;
-	}
 }
 
 .headline {
+	width: 90vw;
+	margin: auto;
 	margin-bottom: 1em;
 	padding-top: 1em;
 }
 
 .relationships {
+	width: 90vw;
+	margin: auto;
 	margin-top: 1em;
 }
 
