@@ -177,6 +177,11 @@ button {
 
 #pdf {
 	border-top: 1px solid var(--border-color);
+	/* Break out of the constrained main container to fill full viewport width */
+	width: 100vw;
+	position: relative;
+	left: 50%;
+	transform: translateX(-50%);
 }
 
 .citation {
