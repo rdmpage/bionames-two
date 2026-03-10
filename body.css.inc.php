@@ -178,3 +178,25 @@ button {
 .citation {
 	font-size:0.8em;
 }
+
+.reference-row {
+	display: flex;
+	gap: 1em;
+	align-items: flex-start;
+}
+
+.thumbnail-pdf {
+	flex-shrink: 0;
+	width: 60px;
+	height: 80px;
+	background-color: var(--border-color);
+	border-radius: 2px;
+}
+
+.thumbnail-no-pdf {
+	flex-shrink: 0;
+	width: 60px;
+	height: 80px;
+	border: 1px solid var(--border-color);
+	border-radius: 2px;
+}

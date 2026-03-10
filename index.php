@@ -488,18 +488,38 @@ function display_entity_details($doc)
 					{
 						$citation = encoding_to_citation($main_entity->isBasedOn->encoding);
 					}
-					
+
+					// Check for a hash:// PDF
+					$has_hash_pdf = false;
+					if (isset($main_entity->isBasedOn->encoding))
+					{
+						$encodings = is_array($main_entity->isBasedOn->encoding)
+							? $main_entity->isBasedOn->encoding
+							: [$main_entity->isBasedOn->encoding];
+						foreach ($encodings as $enc)
+						{
+							if (isset($enc->encodingFormat) && $enc->encodingFormat === 'application/pdf'
+								&& isset($enc->contentUrl) && strpos($enc->contentUrl, 'hash://') === 0)
+							{
+								$has_hash_pdf = true;
+								break;
+							}
+						}
+					}
+
 				}
-				
+
 				if ($link_id != '')
-				{			
+				{
 					$ns_id = id_to_key_value($link_id);
-					
+					$thumbnail_class = $has_hash_pdf ? 'thumbnail-pdf' : 'thumbnail-no-pdf';
+
 					echo '<div>';
 					echo '<h3>Based on</h3>';
-					//echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
+					echo '<div class="reference-row">';
+					echo '<div class="' . $thumbnail_class . '"></div>';
 					echo '<a href="' . $ns_id[0] . '/' . $ns_id[1] . '">';
-					
+
 					if ($citation != '')
 					{
 						echo $citation;
@@ -509,6 +529,7 @@ function display_entity_details($doc)
 						echo $link_name;
 					}
 					echo '</a>';
+					echo '</div>';
 					echo '</div>';
 				}
 				else
