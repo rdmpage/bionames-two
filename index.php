@@ -465,6 +465,7 @@ function display_entity_details($doc)
 			{
 				$link_id = '';
 				$link_name = '[Unknown]';
+				$link_pdf = '';
 				
 				$citation = '';
 				
@@ -490,7 +491,6 @@ function display_entity_details($doc)
 					}
 
 					// Check for a hash:// PDF
-					$has_hash_pdf = false;
 					if (isset($main_entity->isBasedOn->encoding))
 					{
 						$encodings = is_array($main_entity->isBasedOn->encoding)
@@ -501,7 +501,7 @@ function display_entity_details($doc)
 							if (isset($enc->encodingFormat) && $enc->encodingFormat === 'application/pdf'
 								&& isset($enc->contentUrl) && strpos($enc->contentUrl, 'hash://') === 0)
 							{
-								$has_hash_pdf = true;
+								$link_pdf = $enc->contentUrl;
 								break;
 							}
 						}
@@ -512,12 +512,17 @@ function display_entity_details($doc)
 				if ($link_id != '')
 				{
 					$ns_id = id_to_key_value($link_id);
-					$thumbnail_class = $has_hash_pdf ? 'thumbnail-pdf' : 'thumbnail-no-pdf';
+					$thumbnail_class = ($link_pdf != '') ? 'thumbnail-pdf' : 'thumbnail-no-pdf';
 
 					echo '<div>';
 					echo '<h3>Based on</h3>';
 					echo '<div class="reference-row">';
-					echo '<div class="' . $thumbnail_class . '"></div>';
+					echo '<div class="' . $thumbnail_class . '">';
+					if ($link_pdf != '')
+					{
+						echo '<img style="border: 1px solid var(--border-color);height: 100%; object-fit: contain;" src="https://content.bionames.org/' . $link_pdf . '/thumbnail">';
+					}
+					echo '</div>';
 					echo '<a href="' . $ns_id[0] . '/' . $ns_id[1] . '">';
 
 					if ($citation != '')

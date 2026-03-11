@@ -189,8 +189,10 @@ button {
 	flex-shrink: 0;
 	width: 60px;
 	height: 80px;
-	background-color: var(--border-color);
-	border-radius: 2px;
+	/* background-color: var(--border-color); */
+	/*border: 1px solid var(--border-color);*/
+	/*border-radius: 2px;*/
+	text-align: center;
 }
 
 .thumbnail-no-pdf {
