@@ -520,7 +520,7 @@ function display_entity_details($doc)
 					echo '<div class="' . $thumbnail_class . '">';
 					if ($link_pdf != '')
 					{
-						echo '<img style="border: 1px solid var(--border-color);height: 100%; object-fit: contain;" src="https://content.bionames.org/' . $link_pdf . '/thumbnail">';
+						echo '<img style="border: 1px solid var(--border-color);height: 100%; object-fit: contain;" onerror="this.onerror=null; this.src=\'80x100.png\'" src="https://content.bionames.org/' . $link_pdf . '/thumbnail">';
 					}
 					echo '</div>';
 					echo '<a href="' . $ns_id[0] . '/' . $ns_id[1] . '">';
