@@ -7,3 +7,5 @@
 *.db
 *.db-wal
 *.db-shm
+bionames-two.bbprojectd/project.lockfile
+bionames-two.bbprojectd/rpage.bbprojectsettings
