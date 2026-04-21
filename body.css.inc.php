@@ -179,6 +179,36 @@ button {
 	font-size:0.8em;
 }
 
+.debug {
+	width: 90vw;
+	margin: 1em auto;
+}
+
+.debug-data {
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+	white-space: pre-wrap;
+	word-break: break-word;
+	border: 1px solid var(--border-color);
+	padding: 1em;
+	margin: 0.5em 0 0 0;
+	font-size: 0.85em;
+	overflow-x: auto;
+}
+
+.json-key     { color: #a626a4; }
+.json-string  { color: #50a14f; }
+.json-number  { color: #986801; }
+.json-boolean { color: #0184bc; }
+.json-null    { color: #a0a1a7; }
+
+@media (prefers-color-scheme: dark) {
+	.json-key     { color: #c678dd; }
+	.json-string  { color: #98c379; }
+	.json-number  { color: #d19a66; }
+	.json-boolean { color: #61afef; }
+	.json-null    { color: #888; }
+}
+
 .reference-row {
 	display: flex;
 	gap: 1em;
@@ -189,10 +219,14 @@ button {
 	flex-shrink: 0;
 	width: 60px;
 	height: 80px;
-	/* background-color: var(--border-color); */
-	/*border: 1px solid var(--border-color);*/
-	/*border-radius: 2px;*/
-	text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.thumbnail-pdf img {
+	max-width: 100%;
+	max-height: 100%;
 }
 
 .thumbnail-no-pdf {
@@ -201,4 +235,14 @@ button {
 	height: 80px;
 	border: 1px solid var(--border-color);
 	border-radius: 2px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.thumbnail-no-pdf .doi-glyph {
+	width: 32px;
+	height: 32px;
+	opacity: 0.7;
+	filter: var(--silhouette-filter);
 }

@@ -69,6 +69,86 @@ function show_citation(cslJsonText, format) {
 }
 
 //----------------------------------------------------------------------------------------
+// Tiny JSON syntax highlighter for .json-highlight blocks.
+(function() {
+	function highlight(text) {
+		return text.replace(
+			/("(?:\\u[a-fA-F0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(?:true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+\-]?\d+)?)/g,
+			function(match, _g1, colon) {
+				var cls = 'json-number';
+				if (/^"/.test(match)) {
+					cls = colon ? 'json-key' : 'json-string';
+				} else if (/^(?:true|false)$/.test(match)) {
+					cls = 'json-boolean';
+				} else if (match === 'null') {
+					cls = 'json-null';
+				}
+				return '<span class="' + cls + '">' + match + '</span>';
+			}
+		);
+	}
+
+	function init() {
+		var blocks = document.querySelectorAll('.json-highlight');
+		blocks.forEach(function(block) {
+			block.innerHTML = highlight(block.textContent);
+		});
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init);
+	} else {
+		init();
+	}
+})();
+
+//----------------------------------------------------------------------------------------
+// Lazy-load thumbnails. Only load when visible, and delay the load slightly so that
+// rapidly scrolling past an image doesn't kick off an unneeded request.
+(function() {
+	var DWELL_MS = 200;
+
+	function init() {
+		var images = document.querySelectorAll('img.lazy-thumb[data-src]');
+		if (images.length === 0) return;
+
+		if (!('IntersectionObserver' in window)) {
+			images.forEach(function(img) {
+				img.src = img.dataset.src;
+				img.removeAttribute('data-src');
+			});
+			return;
+		}
+
+		var observer = new IntersectionObserver(function(entries) {
+			entries.forEach(function(entry) {
+				var img = entry.target;
+				if (entry.isIntersecting) {
+					img._loadTimer = setTimeout(function() {
+						if (img.dataset.src) {
+							img.src = img.dataset.src;
+							img.removeAttribute('data-src');
+						}
+						observer.unobserve(img);
+					}, DWELL_MS);
+				} else if (img._loadTimer) {
+					clearTimeout(img._loadTimer);
+					img._loadTimer = null;
+				}
+			});
+		}, { rootMargin: '200px' });
+
+		images.forEach(function(img) { observer.observe(img); });
+	}
+
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', init);
+	} else {
+		init();
+	}
+})();
+
+//----------------------------------------------------------------------------------------
 function drawTreemap(path) {
 	var url = 'api.php?path=' + encodeURIComponent(path);
 

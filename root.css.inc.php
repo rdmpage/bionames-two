@@ -41,7 +41,7 @@
 	
 	--type-bg: var(--input-bg);
 	
-	--link-bg: green;
+	--link-bg: #cfe8ff;
 	--link-text: blue;
 	
 	--cell-bg: #eeeeee;

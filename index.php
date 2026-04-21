@@ -230,42 +230,75 @@ function encoding_to_citation($encoding, $format = 'apa')
 function display_datafeed($feed)
 {
 	echo '<h2>' . entity_name($feed) . '</h2>';
-	echo '<ul style="padding-left:1em;">';
+	echo '<ul style="padding-left:0;list-style:none;">';
 	foreach ($feed->dataFeedElement as $dataFeedElement)
 	{
-		if (in_array($dataFeedElement->item->type, ['Book', 'Chapter', 'CreativeWork', 'ScholarlyArticle']))
+		$item = $dataFeedElement->item;
+
+		$is_reference = in_array($item->type, ['Book', 'Chapter', 'CreativeWork', 'ScholarlyArticle']);
+
+		if ($is_reference)
 		{
-			$list_class = 'closed';
-			
-			if (isset($dataFeedElement->item->isAccessibleForFree))
+			$link_pdf = '';
+			if (isset($item->encoding))
 			{
-				if ($dataFeedElement->item->isAccessibleForFree)
+				$encodings = is_array($item->encoding) ? $item->encoding : [$item->encoding];
+				foreach ($encodings as $enc)
 				{
-					$list_class = 'open';
+					if (isset($enc->encodingFormat) && $enc->encodingFormat === 'application/pdf'
+						&& isset($enc->contentUrl) && strpos($enc->contentUrl, 'hash://') === 0)
+					{
+						$link_pdf = $enc->contentUrl;
+						break;
+					}
 				}
 			}
-			echo '<li class="' . $list_class . '">';
+
+			echo '<li style="margin-bottom:0.75em;">';
+			echo '<div class="reference-row">';
+
+			$thumbnail_class = ($link_pdf != '') ? 'thumbnail-pdf' : 'thumbnail-no-pdf';
+			echo '<div class="' . $thumbnail_class . '">';
+			if ($link_pdf != '')
+			{
+				echo '<img class="lazy-thumb" style="border: 1px solid var(--border-color);" onerror="this.onerror=null; this.src=\'80x100.png\'" src="80x100.png" data-src="https://content.bionames.org/' . $link_pdf . '/thumbnail">';
+			}
+			elseif (isset($item->doi))
+			{
+				echo '<img class="doi-glyph" src="assets/doi.svg" alt="DOI">';
+			}
+			echo '</div>';
+
+			echo '<div>';
+			$kv = id_to_key_value($item->id);
+			echo '<a href="' . $kv[0] . '/' . $kv[1] . '">';
+			echo entity_name($item);
+			echo '</a>';
+
+			echo '<br/>';
+			if (isset($item->doi))
+			{
+				echo $item->doi;
+			}
+			echo '</div>';
+
+			echo '</div>';
+			echo '</li>';
 		}
 		else
 		{
 			echo '<li>';
+			$kv = id_to_key_value($item->id);
+			echo '<a href="' . $kv[0] . '/' . $kv[1] . '">';
+			echo entity_name($item);
+			echo '</a>';
+			echo '<br/>';
+			if (isset($item->doi))
+			{
+				echo $item->doi;
+			}
+			echo '</li>';
 		}
-		
-		$kv = id_to_key_value($dataFeedElement->item->id);
-
-		//echo '<a href="?id=' . $kv[1] . '&namespace=' . $kv[0] . '">';
-		echo '<a href="' . $kv[0] . '/' . $kv[1] . '">';
-		
-		echo entity_name($dataFeedElement->item);
-		echo '</a>';
-
-		echo '<br/>';
-		if (isset($dataFeedElement->item->doi))
-		{
-			echo $dataFeedElement->item->doi;
-		}
-		
-		echo '</li>';
 	}
 	echo '</ul>';
 }
@@ -274,6 +307,8 @@ function display_datafeed($feed)
 //----------------------------------------------------------------------------------------
 function display_entity_details($doc)
 {	
+	global $config;
+	
 	echo '<div class="headline">';
 
 	// Any entity
@@ -466,9 +501,10 @@ function display_entity_details($doc)
 				$link_id = '';
 				$link_name = '[Unknown]';
 				$link_pdf = '';
-				
+				$link_doi = '';
+
 				$citation = '';
-				
+
 				if (is_string($main_entity->isBasedOn))
 				{
 					$link_id = $main_entity->isBasedOn;
@@ -483,7 +519,11 @@ function display_entity_details($doc)
 					{
 						$link_name = $main_entity->isBasedOn->name;
 					}
-					
+					if (isset($main_entity->isBasedOn->doi))
+					{
+						$link_doi = $main_entity->isBasedOn->doi;
+					}
+
 					// CSL-JSON
 					if (isset($main_entity->isBasedOn->encoding))
 					{
@@ -520,7 +560,11 @@ function display_entity_details($doc)
 					echo '<div class="' . $thumbnail_class . '">';
 					if ($link_pdf != '')
 					{
-						echo '<img style="border: 1px solid var(--border-color);height: 100%; object-fit: contain;" onerror="this.onerror=null; this.src=\'80x100.png\'" src="https://content.bionames.org/' . $link_pdf . '/thumbnail">';
+						echo '<img class="lazy-thumb" style="border: 1px solid var(--border-color);" onerror="this.onerror=null; this.src=\'80x100.png\'" src="80x100.png" data-src="https://content.bionames.org/' . $link_pdf . '/thumbnail">';
+					}
+					elseif ($link_doi != '')
+					{
+						echo '<img class="doi-glyph" src="assets/doi.svg" alt="DOI">';
 					}
 					echo '</div>';
 					echo '<a href="' . $ns_id[0] . '/' . $ns_id[1] . '">';
@@ -719,12 +763,17 @@ function display_entity_details($doc)
 		}
 	}
 
-	if (0)
+	if ($config['show_data'])
 	{
 		// debug display simplified data
+		echo '<div class="debug">';
 		echo '<h2>Data</h2>';
-		echo '<div class="debug-data">';
-		echo json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+		echo '<details>';
+		echo '<summary>JSON-LD</summary>';
+		echo '<pre class="debug-data json-highlight">';
+		echo htmlspecialchars(json_encode($doc, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+		echo '</pre>';
+		echo '</details>';
 		echo '</div>';
 	}
 	
@@ -867,13 +916,6 @@ echo '
 }
 .unranked {
 	background-color: var(--unranked-bg);
-}
-
-.debug-data {
-	font-family: monospace;
-	white-space: pre-wrap;
-	border: 1px solid var(--border-color);
-	padding: 1em;
 }
 
 ';
@@ -1098,6 +1140,20 @@ function display_search($q)
 		echo json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 		echo '</div>';
 	}
+	
+	if ($config['show_data'])
+	{
+		// debug display simplified data
+		echo '<div class="debug">';
+		echo '<h2>Data</h2>';
+		echo '<details>';
+		echo '<summary>JSON-LD</summary>';
+		echo '<pre class="debug-data json-highlight">';
+		echo htmlspecialchars(json_encode($results, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE));
+		echo '</pre>';
+		echo '</details>';
+		echo '</div>';
+	}	
 	
 	echo '</div>';
 
