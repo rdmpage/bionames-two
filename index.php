@@ -227,8 +227,118 @@ function encoding_to_citation($encoding, $format = 'apa')
 }
 
 //----------------------------------------------------------------------------------------
+// Pick a thumbnail kind for a reference item: 'pdf' (with hash url), 'doi', or ''.
+function reference_thumbnail($item)
+{
+	$thumb = ['kind' => '', 'pdf' => ''];
+
+	if (isset($item->encoding))
+	{
+		$encodings = is_array($item->encoding) ? $item->encoding : [$item->encoding];
+		foreach ($encodings as $enc)
+		{
+			if (isset($enc->encodingFormat) && $enc->encodingFormat === 'application/pdf'
+				&& isset($enc->contentUrl) && strpos($enc->contentUrl, 'hash://') === 0)
+			{
+				$thumb['kind'] = 'pdf';
+				$thumb['pdf']  = $enc->contentUrl;
+				return $thumb;
+			}
+		}
+	}
+
+	if (isset($item->doi))
+	{
+		$thumb['kind'] = 'doi';
+	}
+
+	return $thumb;
+}
+
+//----------------------------------------------------------------------------------------
+// Grid display for a DataFeed of references: tiles grouped by year, year acts as a separator.
+function display_datafeed_grid($feed)
+{
+	echo '<h2>' . entity_name($feed) . ' (' . count($feed->dataFeedElement) . ')</h2>';
+
+	// Group by year; items without a year fall into a '' bucket shown last
+	$by_year = [];
+	foreach ($feed->dataFeedElement as $dataFeedElement)
+	{
+		$item = $dataFeedElement->item;
+		$year = '';
+		if (isset($item->datePublished))
+		{
+			if (preg_match('/^(\d{4})/', (string)$item->datePublished, $m))
+			{
+				$year = $m[1];
+			}
+		}
+		$by_year[$year][] = $item;
+	}
+
+	ksort($by_year, SORT_STRING);
+	if (isset($by_year['']))
+	{
+		$blanks = $by_year[''];
+		unset($by_year['']);
+		$by_year[''] = $blanks;
+	}
+
+	echo '<div class="works-grid">';
+	foreach ($by_year as $year => $items)
+	{
+		echo '<div class="works-year-tile">' . ($year !== '' ? htmlspecialchars($year) : '?') . '</div>';
+
+		foreach ($items as $item)
+		{
+			$kv = id_to_key_value($item->id);
+			$href = ($kv && count($kv) == 2) ? ($kv[0] . '/' . $kv[1]) : '#';
+
+			$title      = entity_name($item);
+			$title_attr = htmlspecialchars($title, ENT_QUOTES);
+
+			$thumb = reference_thumbnail($item);
+
+			echo '<a class="work-tile work-tile-' . ($thumb['kind'] != '' ? $thumb['kind'] : 'plain') . '" href="' . $href . '" title="' . $title_attr . '">';
+			echo '<span class="work-tile-title">' . htmlspecialchars($title) . '</span>';
+			if ($thumb['kind'] === 'pdf')
+			{
+				echo '<img class="lazy-thumb work-tile-thumb" alt="" onerror="this.onerror=null; this.src=\'80x100.png\'" src="80x100.png" data-src="https://content.bionames.org/' . $thumb['pdf'] . '/thumbnail">';
+			}
+			elseif ($thumb['kind'] === 'doi')
+			{
+				echo '<img class="doi-glyph work-tile-glyph" src="assets/doi.svg" alt="DOI">';
+			}
+			echo '</a>';
+		}
+	}
+	echo '</div>';
+}
+
+//----------------------------------------------------------------------------------------
 function display_datafeed($feed)
 {
+	// Switch to a grid view when the feed is a sizeable list of references
+	// (e.g., a journal's articles). Keep the list view for short feeds and
+	// non-reference DataFeeds (such as names-in-reference).
+	$reference_types = ['Book', 'Chapter', 'CreativeWork', 'ScholarlyArticle'];
+	$all_references = count($feed->dataFeedElement) > 0;
+	foreach ($feed->dataFeedElement as $dataFeedElement)
+	{
+		if (!in_array($dataFeedElement->item->type, $reference_types))
+		{
+			$all_references = false;
+			break;
+		}
+	}
+
+	if ($all_references && count($feed->dataFeedElement) >= 10)
+	{
+		display_datafeed_grid($feed);
+		return;
+	}
+
 	echo '<h2>' . entity_name($feed) . '</h2>';
 	echo '<ul style="padding-left:0;list-style:none;">';
 	foreach ($feed->dataFeedElement as $dataFeedElement)
