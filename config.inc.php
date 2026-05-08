@@ -15,7 +15,7 @@ date_default_timezone_set('UTC');
 $config['site_name'] 	= 'BioNames';
 
 $local = true;
-//$local = false;
+$local = false;
 
 if ($local)
 {
@@ -31,15 +31,20 @@ else
 // Database-------------------------------------------------------------------------------
 if ($local)
 {
-	$config['pdo'] = new PDO('sqlite:../bionames-sqlite-o/bionames.db');
+	$config['pdo'] = new PDO('sqlite:/Users/rpage/Development/bionames-sqlite/bionames.db');
 }
 else
 {
 	$config['pdo'] = new PDO('sqlite:bionames-web.db');
 }
 
+// Interface------------------------------------------------------------------------------
 
+// Dimensions of treemap (used when calculating cell sizes)
 $config['treemap_width']  = 1200;
 $config['treemap_height'] =  800;
+
+// Whether we display the data or not
+$config['show_data'] = true;
 
 ?>
