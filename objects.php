@@ -84,7 +84,12 @@ function add_work_context($context)
 	
 	// BIBO
 	$context->bibo = 'http://purl.org/ontology/bibo/';
-	$context->handle = 'bibo:handle';				
+	$context->handle = 'bibo:handle';	
+	
+	// Made up			
+	$context->biostor = 'https://biostor.org/reference/';
+	$context->cnki = 'https://oversea.cnki.net/';
+	$context->jstor = 'https://www.jstor.org/stable/';
 
 	return $context;
 }
@@ -147,7 +152,7 @@ function db_row_to_reference(
 	$embedded = false,
 	$keys = ['sici', 'title', 'journal', 'volume', 'issue', 'spage', 'epage', 'year',
 		'issn', 'isbn', 'oclc', 'publisher', 
-		'doi', 'handle', 
+		'doi', 'handle', 'biostor', 'jstor', 'cnki',
 		'url']
 	)
 {
@@ -185,6 +190,14 @@ function db_row_to_reference(
 		{
 			switch ($k)
 			{
+				case 'biostor':
+					$obj->biostor = $row->{$k};
+					break;																		
+
+				case 'cnki':
+					$obj->cnki = $row->{$k};
+					break;																		
+
 				case 'doi':
 					$obj->doi = strtolower($row->{$k});
 					$obj->sameAs = 'https://doi.org/' . strtolower($row->{$k});
@@ -249,7 +262,11 @@ function db_row_to_reference(
 						$obj->isPartOf->type = 'Book';
 						$obj->isPartOf->isbn = $row->isbn;
 					}						
-					break;									
+					break;	
+					
+				case 'jstor':
+					$obj->jstor = $row->{$k};
+					break;																		
 								
 				case 'sici':
 					$obj->id = 'https://bionames.org/references/' . $row->{$k};
@@ -395,6 +412,14 @@ function get_reference_csl($id)
 			{
 				switch ($k)
 				{
+					case 'biostor': // madeup CSL field
+						$obj->BIOSTOR = $row->{$k};
+						break;										
+
+					case 'cnki': // madeup CSL field
+						$obj->CNKI = $row->{$k};
+						break;										
+				
 					case 'doi':
 						$obj->DOI= strtolower($row->{$k});
 						break;
@@ -410,6 +435,10 @@ function get_reference_csl($id)
 					case 'journal':
 						$obj->{'container-title'} = $row->{$k};
 						break;
+												
+					case 'jstor': // madeup CSL field
+						$obj->JSTOR = $row->{$k};
+						break;						
 						
 					case 'sici':
 						$obj->id = $row->{$k};

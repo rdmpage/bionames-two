@@ -40,10 +40,22 @@ function external_identifier_link($namespace, $value)
 			$html = '<a class="external" href="http://www.organismnames.com/details.htm?lsid=' . str_replace('urn:lsid:organismnames.com:name:', '', $value) . '" target="_new">' . $value . '</a>';			
 			break;
 
-		case 'oclcnum':
-			$html = '<a class="external" href="https://worldcat.org/oclc/' . $value . '" target="_new">' . $value . '</a>';			
+		case 'biostor':
+			$html = '<a class="external" href="https://biostor.org/reference/' . $value . '" target="_new">' . $value . '</a>';
 			break;
-						
+
+		case 'jstor':
+			$html = '<a class="external" href="https://www.jstor.org/stable/' . $value . '" target="_new">' . $value . '</a>';
+			break;
+
+		case 'cnki':
+			$html = '<a class="external" href="https://oversea.cnki.net/kcms/detail/detail.aspx?dbcode=CJFD&filename=' . $value . '" target="_new">' . $value . '</a>';
+			break;
+
+		case 'oclcnum':
+			$html = '<a class="external" href="https://worldcat.org/oclc/' . $value . '" target="_new">' . $value . '</a>';
+			break;
+
 		default:
 			$html = $value;
 			break;
@@ -448,10 +460,28 @@ function display_entity_details($doc)
 	
 	if (isset($main_entity->handle))
 	{
-		echo '<dt>Handle</dt>';				
-		echo '<dd>' . external_identifier_link('handle', $main_entity->handle) . '</dd>';		
+		echo '<dt>Handle</dt>';
+		echo '<dd>' . external_identifier_link('handle', $main_entity->handle) . '</dd>';
 	}
-	
+
+	if (isset($main_entity->biostor))
+	{
+		echo '<dt>BioStor</dt>';
+		echo '<dd>' . external_identifier_link('biostor', $main_entity->biostor) . '</dd>';
+	}
+
+	if (isset($main_entity->jstor))
+	{
+		echo '<dt>JSTOR</dt>';
+		echo '<dd>' . external_identifier_link('jstor', $main_entity->jstor) . '</dd>';
+	}
+
+	if (isset($main_entity->cnki))
+	{
+		echo '<dt>CNKI</dt>';
+		echo '<dd>' . external_identifier_link('cnki', $main_entity->cnki) . '</dd>';
+	}
+
 	if (isset($main_entity->issn))
 	{
 		echo '<dt>ISSN</dt>';				
