@@ -111,12 +111,12 @@ function id_to_key_value($id)
 {
 	$kv = [];
 	
-	if (preg_match('/(issn):([0-9]{4}-[0-9]{3}[0-9X])/', $id, $m))
+	if (preg_match('/(issn)[:\/]([0-9]{4}-[0-9]{3}[0-9X])/', $id, $m))
 	{
 		$kv = [$m[1], $m[2]];
 	}
-	
-	if (preg_match('/(isbn):(\d{9,12}[0-9X])/', $id, $m))
+
+	if (preg_match('/(isbn)[:\/](\d{9,12}[0-9X])/', $id, $m))
 	{
 		$kv = [$m[1], $m[2]];
 	}
@@ -514,10 +514,18 @@ function display_entity_details($doc)
 
 			// Extract namespace and id from the sameAs identifier
 			$ns_id = id_to_key_value($sameAs_id);
-			//echo '<a href="?id=' . $ns_id[1] . '&namespace=' . $ns_id[0] . '">';
-			echo '<a href="' . $ns_id[0] . '/' . $ns_id[1] . '">';
-			echo htmlspecialchars($sameAs_id);
-			echo '</a>';
+			if (count($ns_id) === 2)
+			{
+				echo '<a href="' . $ns_id[0] . '/' . $ns_id[1] . '">';
+				echo htmlspecialchars($sameAs_id);
+				echo '</a>';
+			}
+			else
+			{
+				echo '<a class="external" href="' . htmlspecialchars($sameAs_id) . '" target="_new">';
+				echo htmlspecialchars($sameAs_id);
+				echo '</a>';
+			}
 		}
 		echo '</dd>';
 	}

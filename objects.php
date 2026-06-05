@@ -219,7 +219,7 @@ function db_row_to_reference(
 					{
 						case 'Chapter':
 							$obj->isPartOf = new stdclass;
-							$obj->isPartOf->id = 'isbn:' . $row->isbn;
+							$obj->isPartOf->id = 'https://bionames.org/isbn/' . $row->isbn;
 							$obj->isPartOf->type = 'Book';
 							$obj->isPartOf->isbn = $row->isbn;
 							
@@ -246,19 +246,19 @@ function db_row_to_reference(
 					
 					if (isset($row->issn))
 					{
-						$obj->isPartOf->id = 'issn:' . $row->issn;
+						$obj->isPartOf->id = 'https://bionames.org/issn/' . $row->issn;
 						$obj->isPartOf->type = 'Periodical';
 						$obj->isPartOf->issn = $row->issn;
 					}
 					elseif (isset($row->oclc))
 					{
-						$obj->isPartOf->id = 'https://worldcat.org/oclc/' . $row->oclc;
+						$obj->isPartOf->id = 'https://bionames.org/oclc/' . $row->oclc;
 						$obj->isPartOf->type = 'Periodical';
 						$obj->isPartOf->oclcnum = $row->oclc;
-					}						
+					}
 					elseif (isset($row->isbn))
 					{
-						$obj->isPartOf->id = 'isbn:' . $row->isbn;
+						$obj->isPartOf->id = 'https://bionames.org/isbn/' . $row->isbn;
 						$obj->isPartOf->type = 'Book';
 						$obj->isPartOf->isbn = $row->isbn;
 					}						
@@ -563,22 +563,26 @@ function get_container($namespace, $id)
 		switch ($namespace)
 		{
 			case 'oclc':
+			case 'oclcnum':
 				$obj->oclcnum = $id;
-				$obj->id = 'https://worldcat.org/oclc/' . $id;	
+				$obj->id = 'https://bionames.org/oclc/' . $id;
+				$obj->sameAs = 'https://worldcat.org/oclc/' . $id;
 				$obj->type = 'CreativeWork';
 				break;
-				
+
 			case 'isbn':
 				$obj->isbn = $id;
-				$obj->id = 'https://worldcat.org/isbn/' . $id;	
+				$obj->id = 'https://bionames.org/isbn/' . $id;
+				$obj->sameAs = 'https://worldcat.org/isbn/' . $id;
 				$obj->type = 'Book';
 				break;
-				
+
 			case 'issn':
 			default:
 				$obj->issn = $id;
-				$obj->id = 'http://issn.org/resource/ISSN/' . $id;	
-				$obj->type = 'Periodical';			
+				$obj->id = 'https://bionames.org/issn/' . $id;
+				$obj->sameAs = 'http://issn.org/resource/ISSN/' . $id;
+				$obj->type = 'Periodical';
 				break;
 		}
 		
@@ -628,8 +632,8 @@ function get_container_works_list($namespace, $id)
 	$feed->dataFeedElement = [];
 	
 
-	$sql = 'SELECT DISTINCT sici, title, journal, volume, issue, spage, epage, year, doi, content_sha1  FROM names';
-	
+	$sql = 'SELECT DISTINCT sici, title, journal, volume, issue, spage, epage, year, doi, issn, oclc, isbn, publisher, isPartOf, content_sha1  FROM names';
+
 	switch ($namespace)
 	{
 		case 'oclc':
@@ -766,21 +770,21 @@ function get_container_list($letter = 'A')
 		
 		if (isset($r->issn))
 		{
-			$container->id = 'http://issn.org/resource/ISSN/' . $r->issn;	
+			$container->id = 'https://bionames.org/issn/' . $r->issn;
 			$container->type = 'Periodical';
-			$container->issn = $r->issn;			
+			$container->issn = $r->issn;
 		}
 		elseif (isset($r->oclcnum))
 		{
-			$container->id = 'https://worldcat.org/oclc/' . $r->oclcnum;	
-			$container->type = 'CreativeWork';	
-			$container->oclcnum = $r->oclcnum;	
+			$container->id = 'https://bionames.org/oclc/' . $r->oclcnum;
+			$container->type = 'CreativeWork';
+			$container->oclcnum = $r->oclcnum;
 		}
 		elseif (isset($r->isbn))
 		{
-			$container->id = 'https://worldcat.org/isbn/' . $r->isbn;
-			$container->type = 'Book';	
-			$container->isbn = $r->isbn;	
+			$container->id = 'https://bionames.org/isbn/' . $r->isbn;
+			$container->type = 'Book';
+			$container->isbn = $r->isbn;
 		}
 		
 		$item->item = $container;		
@@ -1118,7 +1122,7 @@ function get_works_path_year($path, $year, $limit = 100)
 
 	$feed->dataFeedElement = [];
 	
-	$sql = 'SELECT DISTINCT sici, title, journal, volume, issue, spage, epage, year, doi, content_sha1 FROM names';
+	$sql = 'SELECT DISTINCT sici, title, journal, volume, issue, spage, epage, year, doi, issn, oclc, isbn, publisher, isPartOf, content_sha1 FROM names';
 	$sql .= ' WHERE "group" LIKE "' . $path . '%"';
 	$sql .= ' AND year=' . $year;
 	$sql .= ' LIMIT ' . $limit;
