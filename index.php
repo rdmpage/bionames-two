@@ -948,19 +948,46 @@ function display_entity_details($doc)
 }
 
 //----------------------------------------------------------------------------------------
+// Render a "not found" page with a 404 status
+function display_not_found($message = 'The record you asked for could not be found.')
+{
+	global $config;
+
+	if (!headers_sent())
+	{
+		header('HTTP/1.1 404 Not Found');
+	}
+
+	display_html_start('Not found');
+	display_navbar('');
+	display_main_start();
+
+	echo '<div class="headline">';
+	echo '<h1>Not found</h1>';
+	echo '<p>' . htmlspecialchars($message) . '</p>';
+	echo '<p><a href="' . htmlspecialchars($config['web_root']) . '">Return to the home page</a> or search for a name above.</p>';
+	echo '</div>';
+
+	display_main_end();
+	display_html_end();
+}
+
+//----------------------------------------------------------------------------------------
 function display_entity($namespace, $id)
 {
 	global $config;
-			
+
 	$doc = get_entity($namespace, $id);
-			
-	if (!$doc)
+
+	// get_entity() returns an array of graphs; a missing record shows up as a
+	// [null] (or otherwise empty) main entity, so guard on that rather than on
+	// the array being non-empty.
+	if (!$doc || !isset($doc[0]) || $doc[0] === null || !is_object($doc[0]))
 	{
-		// bounce
-		header('Location: /?error=Record not found' . "\n\n");
+		display_not_found();
 		exit(0);
 	}
-	
+
 	$title = entity_name($doc[0]);
 	
  	display_html_start($title, $doc);
@@ -1445,9 +1472,16 @@ function display_path($path)
 	$title = classification_label($path);
 
 	$doc = get_taxon($title);
-	
+
+	// get_taxon() returns an empty array for an unknown classification path
+	if (!$doc || !isset($doc[0]) || !is_object($doc[0]))
+	{
+		display_not_found('No classification was found for "' . $path . '".');
+		exit(0);
+	}
+
 	$main_entity = $doc[0];
-	
+
 	display_html_start($title);
 	display_navbar('');
 	display_main_start();

@@ -340,10 +340,10 @@ function get_reference($id, $embedded = false)
 {
 	$obj = null;
 	
-	$sql = "SELECT * FROM names WHERE sici='$id' LIMIT 1";
-	
-	$data = db_get($sql);
-	
+	$sql = "SELECT * FROM names WHERE sici=? LIMIT 1";
+
+	$data = db_get($sql, [$id]);
+
 	if ($data && isset($data[0]))
 	{
 		$obj = db_row_to_reference($data[0], $embedded);
@@ -359,9 +359,9 @@ function get_reference_id_from_doi($doi)
 	$id = '';
 	
 	// like because we are doing a case insensitive search and LIKE is fatser than =
-	$sql = "SELECT * FROM names WHERE doi LIKE '$doi' LIMIT 1";
-	
-	$data = db_get($sql);
+	$sql = "SELECT * FROM names WHERE doi LIKE ? LIMIT 1";
+
+	$data = db_get($sql, [$doi]);
 	
 	if ($data && isset($data[0]))
 	{
@@ -377,10 +377,10 @@ function get_reference_csl($id)
 {
 	$obj = null;
 	
-	$sql = "SELECT * FROM names WHERE sici='$id' LIMIT 1";
-	
-	$data = db_get($sql);
-	
+	$sql = "SELECT * FROM names WHERE sici=? LIMIT 1";
+
+	$data = db_get($sql, [$id]);
+
 	// keys relevant to CSL
 	$keys = ['sici', 'title', 'journal', 'volume', 'issue', 'spage', 'epage', 'year', 'issn', 'isbn', 'oclc', 'doi', 'url', 'publisher'];
 	
@@ -492,10 +492,9 @@ function get_names_in_reference($sici)
 
 	$feed->dataFeedElement = [];
 
-	$escaped_sici = str_replace("'", "''", $sici);
-	$sql = "SELECT id, nameComplete, taxonAuthor, rank FROM names WHERE sici='$escaped_sici' ORDER BY nameComplete";
+	$sql = "SELECT id, nameComplete, taxonAuthor, rank FROM names WHERE sici=? ORDER BY nameComplete";
 
-	$data = db_get($sql);
+	$data = db_get($sql, [$sici]);
 
 	foreach ($data as $row)
 	{
@@ -532,26 +531,26 @@ function get_container($namespace, $id)
 	$obj = null;
 	
 	$sql = 'SELECT COUNT(id) AS c, journal FROM names WHERE journal IS NOT NULL AND ';
-	
+
 	switch ($namespace)
 	{
 		case 'oclc':
 		case 'oclcnum':
-			$sql .= ' oclc="' . $id . '"';
+			$sql .= ' oclc=?';
 			break;
-			
+
 		case 'isbn':
-			$sql .= ' isbn="' . $id . '"';
-			break;			
-			
+			$sql .= ' isbn=?';
+			break;
+
 		case 'issn':
 		default:
-			$sql .= ' issn="' . $id . '"';
+			$sql .= ' issn=?';
 			break;
 	}
 	$sql .= ' GROUP BY journal';
-	
-	$data = db_get($sql);
+
+	$data = db_get($sql, [$id]);
 	
 	if (count($data) > 0)
 	{
@@ -638,22 +637,22 @@ function get_container_works_list($namespace, $id)
 	{
 		case 'oclc':
 		case 'oclcnum':
-			$sql .= ' WHERE oclc="' . $id . '"';
+			$sql .= ' WHERE oclc=?';
 			break;
 
 		case 'isbn':
-			$sql .= ' WHERE isbn="' . $id . '"';
+			$sql .= ' WHERE isbn=?';
 			break;
-	
+
 		case 'issn':
 		default:
-			$sql .= ' WHERE issn="' . $id . '"';
+			$sql .= ' WHERE issn=?';
 			break;
 	}
-	
+
 	$sql .= ' ORDER BY year';
-	
-	$data = db_get($sql);
+
+	$data = db_get($sql, [$id]);
 	
 	// keys relevant to a simple list of references
 	$keys = ['sici', 'title', 'journal', 'year', 'doi', 'content_sha1'];
@@ -675,9 +674,9 @@ function get_related_names($id)
 {
 	$related = array();
 	
-	$sql = "SELECT * FROM variants INNER JOIN names ON target_id = id WHERE source_id=$id";
-	
-	$data = db_get($sql);	
+	$sql = "SELECT * FROM variants INNER JOIN names ON target_id = id WHERE source_id=?";
+
+	$data = db_get($sql, [$id]);
 	foreach ($data as $row)
 	{
 		$name = $row->nameComplete;
@@ -687,10 +686,10 @@ function get_related_names($id)
 		}
 		$related[$row->target_id] = $name;
 	}
-	
-	$sql = "SELECT * FROM variants INNER JOIN names ON source_id = id WHERE target_id=$id";
 
-	$data = db_get($sql);	
+	$sql = "SELECT * FROM variants INNER JOIN names ON source_id = id WHERE target_id=?";
+
+	$data = db_get($sql, [$id]);
 	foreach ($data as $row)
 	{
 		$name = $row->nameComplete;
@@ -716,11 +715,11 @@ function get_container_list($letter = 'A')
 
 	$feed->dataFeedElement = [];
 
-	$sql = "SELECT DISTINCT journal, issn, oclc, isbn FROM names WHERE journal LIKE '$letter%' ORDER BY journal";
-	
+	$sql = "SELECT DISTINCT journal, issn, oclc, isbn FROM names WHERE journal LIKE ? ORDER BY journal";
+
 	$results = array();
-	
-	$data = db_get($sql);	
+
+	$data = db_get($sql, [$letter . '%']);
 	foreach ($data as $row)
 	{
 		$key = $row->journal;
@@ -799,9 +798,9 @@ function get_name($id, $expand = true)
 {
 	$obj = null;
 
-	$sql = "SELECT * FROM names WHERE id=$id LIMIT 1";
+	$sql = "SELECT * FROM names WHERE id=? LIMIT 1";
 
-	$data = db_get($sql);
+	$data = db_get($sql, [$id]);
 
 	$keys = ['id', 'cluster_id', 'nameComplete', 'taxonAuthor', 'rank', 'group',
 		'uninomial', 'genusPart', 'infragenericEpithet', 'specificEpithet', 'specificStem', 'infraspecificEpithet', 'infraspecificStem', 'publication', 'sici'];
@@ -911,18 +910,18 @@ function search_names($query)
 	{
 		// Search by genus name
 		$genus_name = trim($matches[1]);
-		$escaped_genus = str_replace("'", "''", $genus_name);
 
-		$sql = "SELECT id, cluster_id, nameComplete, taxonAuthor FROM names WHERE genusPart = '$escaped_genus' ORDER BY nameComplete";
+		$sql = "SELECT id, cluster_id, nameComplete, taxonAuthor FROM names WHERE genusPart = ? ORDER BY nameComplete";
+		$param = $genus_name;
 	}
 	else
 	{
 		// Regular exact name search
-		$escaped_query = str_replace("'", "''", $query);
-		$sql = "SELECT id, cluster_id, nameComplete, taxonAuthor FROM names WHERE nameComplete = '$escaped_query' ORDER BY nameComplete";
+		$sql = "SELECT id, cluster_id, nameComplete, taxonAuthor FROM names WHERE nameComplete = ? ORDER BY nameComplete";
+		$param = $query;
 	}
 
-	$data = db_get($sql);
+	$data = db_get($sql, [$param]);
 
 	foreach ($data as $row)
 	{
@@ -957,9 +956,9 @@ function search_names($query)
 function get_cluster($cluster_id)
 {
 	// Get the representative name (the one where id = cluster_id)
-	$sql = "SELECT id, nameComplete, rank, `group` FROM names WHERE id = '$cluster_id' LIMIT 1";
+	$sql = "SELECT id, nameComplete, rank, `group` FROM names WHERE id = ? LIMIT 1";
 
-	$data = db_get($sql);
+	$data = db_get($sql, [$cluster_id]);
 
 	if (count($data) == 0)
 	{
@@ -996,8 +995,8 @@ function get_cluster($cluster_id)
 	}
 
 	// Get all names for this cluster_id
-	$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE cluster_id = '$cluster_id'";
-	$data = db_get($sql);
+	$sql = "SELECT id, nameComplete, taxonAuthor FROM names WHERE cluster_id = ?";
+	$data = db_get($sql, [$cluster_id]);
 
 	$obj->scientificName = array();
 	foreach ($data as $row)
@@ -1085,8 +1084,8 @@ function tree_get_children($node)
 	$children = array();
 	
 	// get children
-	$sql = "SELECT * FROM tree WHERE parent='" . $node . "'";
-	$data = db_get($sql);
+	$sql = "SELECT * FROM tree WHERE parent=?";
+	$data = db_get($sql, [$node]);
 	
 	foreach ($data as $row)
 	{
@@ -1123,11 +1122,11 @@ function get_works_path_year($path, $year, $limit = 100)
 	$feed->dataFeedElement = [];
 	
 	$sql = 'SELECT DISTINCT sici, title, journal, volume, issue, spage, epage, year, doi, issn, oclc, isbn, publisher, isPartOf, content_sha1 FROM names';
-	$sql .= ' WHERE "group" LIKE "' . $path . '%"';
-	$sql .= ' AND year=' . $year;
-	$sql .= ' LIMIT ' . $limit;
-		
-	$data = db_get($sql);
+	$sql .= ' WHERE "group" LIKE ?';
+	$sql .= ' AND year=?';
+	$sql .= ' LIMIT ' . (int)$limit;
+
+	$data = db_get($sql, [$path . '%', $year]);
 	
 	// keys relevant to a simple list of references
 	$keys = ['sici', 'title', 'journal', 'year', 'doi', 'content_sha1'];
@@ -1150,9 +1149,9 @@ function get_taxon($label)
 {
 	$result = [];
 	
-	$sql = "SELECT * FROM tree WHERE label='$label' LIMIT 1";
+	$sql = "SELECT * FROM tree WHERE label=? LIMIT 1";
 
-	$data = db_get($sql);
+	$data = db_get($sql, [$label]);
 
 	if (count($data) == 0)
 	{

@@ -5,13 +5,26 @@ require_once (dirname(__FILE__) . '/config.inc.php');
 
 //----------------------------------------------------------------------------------------
 // retrieve data from database
-function db_get($sql)
+//
+// Pass $params (an array) to run the query as a prepared statement with bound
+// parameters. Use this whenever the query contains user-supplied values, e.g.:
+//     db_get('SELECT * FROM names WHERE id = ?', [$id]);
+// $sql without $params is still run verbatim for static, trusted queries.
+function db_get($sql, $params = null)
 {
 	global $config;
-	
+
 	$pdo = $config['pdo'];
-	
-	$stmt = $pdo->query($sql);
+
+	if ($params === null)
+	{
+		$stmt = $pdo->query($sql);
+	}
+	else
+	{
+		$stmt = $pdo->prepare($sql);
+		$stmt->execute($params);
+	}
 
 	$data = array();
 
