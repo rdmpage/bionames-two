@@ -299,13 +299,17 @@ function db_row_to_reference(
 		}
 	}
 	
-	// CSL-JSON
-	$encoding = new stdclass;
-	$encoding->encodingFormat = 'application/vnd.citationstyles.csl+json';
-	$encoding->text = json_encode(get_reference_csl($row->sici));
-	
 	$obj->encoding = [];
-	$obj->encoding[] = $encoding;
+
+	// CSL-JSON (only if this row is an actual reference with a sici)
+	if (isset($row->sici))
+	{
+		$encoding = new stdclass;
+		$encoding->encodingFormat = 'application/vnd.citationstyles.csl+json';
+		$encoding->text = json_encode(get_reference_csl($row->sici));
+
+		$obj->encoding[] = $encoding;
+	}
 	
 	/*
 	// raw PDF URL
@@ -1101,18 +1105,20 @@ function tree_get_children($node)
 }
 
 //----------------------------------------------------------------------------------------
-// List of works in container (e.g., articles in a journal)
-function get_works_path_year($path, $year, $limit = 100)
+// List of works in container (e.g., articles in a journal).
+// Pass $year to restrict to a single year, or null (default) for the most
+// recent works across all years.
+function get_works_path_year($path, $year = null, $limit = 100)
 {
 	$feed = new stdclass;
 	$feed->{@context} = create_context();
 	$feed->{@context} = add_container_context($feed->{@context});
 	$feed->type = 'DataFeed';
-	
+
 	// label feed
-	if ((int)$year === (int)date('Y'))
+	if ($year === null)
 	{
-		$feed->name = $limit .' most recent works on taxon ' . classification_label($path);
+		$feed->name = $limit . ' most recent works on taxon ' . classification_label($path);
 	}
 	else
 	{
@@ -1120,13 +1126,23 @@ function get_works_path_year($path, $year, $limit = 100)
 	}
 
 	$feed->dataFeedElement = [];
-	
+
 	$sql = 'SELECT DISTINCT sici, title, journal, volume, issue, spage, epage, year, doi, issn, oclc, isbn, publisher, isPartOf, content_sha1 FROM names';
 	$sql .= ' WHERE "group" LIKE ?';
-	$sql .= ' AND year=?';
+	$sql .= " AND sici IS NOT NULL AND sici != ''";
+	$params = [$path . '%'];
+
+	if ($year !== null)
+	{
+		$sql .= ' AND year=?';
+		$params[] = $year;
+	}
+
+	// Most recent first; rows without a year (NULL) sort last in SQLite.
+	$sql .= ' ORDER BY year DESC';
 	$sql .= ' LIMIT ' . (int)$limit;
 
-	$data = db_get($sql, [$path . '%', $year]);
+	$data = db_get($sql, $params);
 	
 	// keys relevant to a simple list of references
 	$keys = ['sici', 'title', 'journal', 'year', 'doi', 'content_sha1'];
@@ -1171,8 +1187,8 @@ function get_taxon($label)
 	
 	$result[] = $obj;
 	
-	//$feed = get_works_path_year($obj->higherClassification, date('Y'));
-	$feed = get_works_path_year($obj->higherClassification, 2025);
+	// Most recent works across all years (see get_works_path_year)
+	$feed = get_works_path_year($obj->higherClassification);
 	
 	$result[] = $feed;
 	

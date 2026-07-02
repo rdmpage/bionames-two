@@ -269,7 +269,7 @@ function reference_thumbnail($item)
 
 //----------------------------------------------------------------------------------------
 // Grid display for a DataFeed of references: tiles grouped by year, year acts as a separator.
-function display_datafeed_grid($feed)
+function display_datafeed_grid($feed, $sort_desc = false)
 {
 	echo '<h2>' . entity_name($feed) . ' (' . count($feed->dataFeedElement) . ')</h2>';
 
@@ -289,7 +289,15 @@ function display_datafeed_grid($feed)
 		$by_year[$year][] = $item;
 	}
 
-	ksort($by_year, SORT_STRING);
+	// Classification view lists most recent year first; journal view oldest first
+	if ($sort_desc)
+	{
+		krsort($by_year, SORT_STRING);
+	}
+	else
+	{
+		ksort($by_year, SORT_STRING);
+	}
 	if (isset($by_year['']))
 	{
 		$blanks = $by_year[''];
@@ -329,7 +337,7 @@ function display_datafeed_grid($feed)
 }
 
 //----------------------------------------------------------------------------------------
-function display_datafeed($feed)
+function display_datafeed($feed, $sort_desc = false)
 {
 	// Switch to a grid view when the feed is a sizeable list of references
 	// (e.g., a journal's articles). Keep the list view for short feeds and
@@ -347,7 +355,7 @@ function display_datafeed($feed)
 
 	if ($all_references && count($feed->dataFeedElement) >= 10)
 	{
-		display_datafeed_grid($feed);
+		display_datafeed_grid($feed, $sort_desc);
 		return;
 	}
 
@@ -1505,9 +1513,10 @@ function display_path($path)
 	{
 		if ($doc[$i]->type == 'DataFeed')
 		{
-			display_datafeed($doc[$i]);
+			// Classification view: most recent works first
+			display_datafeed($doc[$i], true);
 		}
-	}	
+	}
 	echo '</div> <!-- relationships -->';
 	
 	
