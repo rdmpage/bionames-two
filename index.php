@@ -998,7 +998,7 @@ function display_entity($namespace, $id)
 
 	$title = entity_name($doc[0]);
 
- 	display_html_start($title, entity_canonical_url($doc[0]));
+ 	display_html_start($title, entity_canonical_url($doc[0]), false, $doc);
 	display_navbar('');
 	display_main_start();
 	
@@ -1010,7 +1010,7 @@ function display_entity($namespace, $id)
 
 //----------------------------------------------------------------------------------------
 // Start of HTML document
-function display_html_start($title = '', $canonical = '', $noindex = false)
+function display_html_start($title = '', $canonical = '', $noindex = false, $entity = null)
 {
 	global $config;
 
@@ -1192,7 +1192,7 @@ function display_search($q)
 	$results = search($q);
 
 	// Search results are thin/duplicate content - keep them out of the index.
-	display_html_start($title, '', true);
+	display_html_start($title, '', true, $results);
 	display_navbar($q);
 	display_main_start();
 	
