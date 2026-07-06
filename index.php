@@ -997,9 +997,9 @@ function display_entity($namespace, $id)
 	}
 
 	$title = entity_name($doc[0]);
-	
- 	display_html_start($title, $doc);
-	display_navbar('');	
+
+ 	display_html_start($title, entity_canonical_url($doc[0]));
+	display_navbar('');
 	display_main_start();
 	
 	display_entity_details($doc);
@@ -1010,10 +1010,10 @@ function display_entity($namespace, $id)
 
 //----------------------------------------------------------------------------------------
 // Start of HTML document
-function display_html_start($title = '', $entity = null)
+function display_html_start($title = '', $canonical = '', $noindex = false)
 {
 	global $config;
-	
+
 	echo '<!DOCTYPE html>
 <head>';
 
@@ -1034,7 +1034,22 @@ function display_html_start($title = '', $entity = null)
     	<base href="' . $config['web_root'] . '" /><!--[if IE]></base><![endif]-->' . "\n";
     
     echo '<link href="favicon.png" rel="icon" type="image/png">';
-    	
+
+    // Canonical URL: tells search engines which URL is authoritative when the
+    // same entity is reachable via several forms (/names/{id}, /urn:lsid:...,
+    // /?namespace=names&id={id}, http/https, etc.).
+    if ($canonical != '')
+    {
+    	echo '<link rel="canonical" href="' . htmlspecialchars($canonical) . '">';
+    }
+
+    // Thin / duplicate pages (search results) should not be indexed, but links
+    // on them may still be followed.
+    if ($noindex)
+    {
+    	echo '<meta name="robots" content="noindex,follow">';
+    }
+
     if ($title == '')
     {
     	$title = $config['site_name'];
@@ -1176,7 +1191,8 @@ function display_search($q)
 
 	$results = search($q);
 
-	display_html_start($title, $results);
+	// Search results are thin/duplicate content - keep them out of the index.
+	display_html_start($title, '', true);
 	display_navbar($q);
 	display_main_start();
 	
@@ -1407,7 +1423,17 @@ function default_display($error_msg = '')
 
 	$title = $config['site_name'];
 
-	display_html_start($title);
+	// The bare home page has one canonical (https://bionames.org/), which also
+	// consolidates the http/https and www/non-www variants. The error variant
+	// (?error=...) is not real content, so keep it out of the index instead.
+	if ($error_msg != '')
+	{
+		display_html_start($title, '', true);
+	}
+	else
+	{
+		display_html_start($title, 'https://bionames.org/');
+	}
 	display_navbar('');
 	display_main_start();
 
@@ -1490,10 +1516,12 @@ function display_path($path)
 
 	$main_entity = $doc[0];
 
-	display_html_start($title);
+	// Canonical is the clean /path/ form (the same classification is also
+	// reachable as /?path=...).
+	display_html_start($title, 'https://bionames.org/path/' . $path);
 	display_navbar('');
 	display_main_start();
-		
+
 	echo '<div class="headline">';
 	echo '<h1>' . htmlspecialchars($main_entity->name) . '</h1>';
 	

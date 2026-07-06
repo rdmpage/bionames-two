@@ -166,6 +166,32 @@ function search($text)
 
 
 //----------------------------------------------------------------------------------------
+// The canonical web URL for an entity, used for <link rel="canonical">.
+// Most entities already carry an absolute bionames.org URL as their id; name
+// entities use a urn:lsid: id, whose canonical web form is the /names/ route.
+function entity_canonical_url($entity)
+{
+	if (!is_object($entity) || !isset($entity->id))
+	{
+		return '';
+	}
+
+	$id = $entity->id;
+
+	if (strpos($id, 'urn:lsid:organismnames.com:name:') === 0)
+	{
+		return 'https://bionames.org/names/' . $id;
+	}
+
+	if (strpos($id, 'http') === 0)
+	{
+		return $id;
+	}
+
+	return '';
+}
+
+//----------------------------------------------------------------------------------------
 function entity_name($entity)
 {
 	$name = 'Unknown';
