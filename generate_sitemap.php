@@ -37,6 +37,16 @@ $SOURCES = [
 		'sql'     => "SELECT id FROM names WHERE id = cluster_id",
 		'path'    => 'cluster/',           // /cluster/{id}
 	],
+	'names' => [
+		'enabled' => true,
+		// One page per name. Canonical form is
+		// /names/urn:lsid:organismnames.com:name:{names.id} (see
+		// entity_canonical_url()). To skip names that are already a cluster
+		// representative (id = cluster_id, surfaced via /cluster/), add:
+		//   WHERE cluster_id IS NULL OR id != cluster_id
+		'sql'     => "SELECT id FROM names",
+		'path'    => 'names/urn:lsid:organismnames.com:name:',
+	],
 	'references' => [
 		'enabled' => true,
 		'sql'     => "SELECT DISTINCT sici FROM names WHERE sici IS NOT NULL AND sici != ''",
