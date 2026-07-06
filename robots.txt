@@ -6,4 +6,8 @@ Disallow: /pdfproxy.php
 # PDF.js viewer wrapper - duplicate viewer pages, not content
 Disallow: /pdfjs-2/
 
+# Search results - thin/duplicate, and multi-word (spaced) queries trip a
+# server WAF rule and return 403. Not content worth crawling.
+Disallow: /search/
+
 Sitemap: https://bionames.org/sitemap.xml
