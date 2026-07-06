@@ -1,0 +1,6 @@
+User-agent: *
+
+# PDF-fetch endpoint for PDF.js, not a crawlable page
+Disallow: /pdfproxy.php
+
+Sitemap: https://bionames.org/sitemap.xml

@@ -4,8 +4,8 @@ RewriteEngine On
 # If you need to use the `RewriteBase` directive, it should be the
 # absolute physical path to the directory that contains this htaccess file.
 #
-RewriteBase /
-#RewriteBase /bionames-two/
+#RewriteBase /
+RewriteBase /bionames-two/
 
 # Reference
 RewriteRule ^references/(.*)   	index.php?id=$1&namespace=references   [NC,L]
@@ -19,9 +19,6 @@ RewriteRule ^isbn/(.*)   		index.php?namespace=isbn&id=$1   [NC,L]
 # Taxonomic name
 RewriteRule ^names/urn:lsid:organismnames.com:name:(\d+)   		index.php?namespace=names&id=$1   [NC,L]
 
-# Cluster of taxonomic names
-RewriteRule ^names/cluster/(.*)   		index.php?namespace=cluster&id=$1   [NC,L]
-
 # Search
 RewriteRule ^search/(.*)   		index.php?q=$1   [NC,L]
 
@@ -31,6 +28,47 @@ RewriteRule ^doi/(.*)   		index.php?namespace=doi&id=$1   [NC,L]
 
 # Classification
 RewriteRule ^path/(.*)   		index.php?path=$1   [NC,L]
+
+
+# ============================================================================
+# Legacy URL handling (old bionames.org scheme -> bionames-two)
+# Added to clear Google Search Console "Not found (404)" errors.
+# ============================================================================
+
+# --- Cluster pages: RECOVERED (data still exists) -----------------------------
+# The old site linked to /cluster/{id}. The code still treats this as the
+# canonical URL (objects.php get_cluster() emits bionames.org/cluster/{id}),
+# but only /names/cluster/{id} was routed, so the canonical URL itself 404'd.
+# Route it directly so these resolve 200 (recovers ~485 URLs).
+RewriteRule ^cluster/([0-9]+)   	index.php?namespace=cluster&id=$1   [NC,L]
+
+# --- Taxon & author pages: 410 Gone -------------------------------------------
+# /taxa/gbif/{id}, /taxa/ncbi/{id} and /authors/{name} were specific features of
+# the old BioNames with no equivalent in the new schema. They are permanently
+# removed. (Redirecting taxa to GBIF/NCBI would just confuse - different site.)
+RewriteRule ^taxa/gbif/   		-   [G]
+RewriteRule ^taxa/ncbi/   		-   [G]
+RewriteRule ^authors/   		-   [G]
+
+# --- Legacy sha1 PDFs: 301 to the cloud archive -------------------------------
+# Old BioNames stored PDFs on disk named by their sha1 hash, under a fanned-out
+# path (.../pdf/5f/be/4a/{sha1}/{sha1}.pdf). They now live in the cloud at
+# content.bionames.org/sha1/{sha1}. The sha1 is in the URL, so redirect directly
+# with no lookup. Most PDFs made the move; any that didn't will 404 at the
+# target - still better than a guaranteed dead end here.
+RewriteRule ^bionames-archive/pdf/[0-9a-f]{2}/[0-9a-f]{2}/[0-9a-f]{2}/[0-9a-f]{40}/([0-9a-f]{40})\.pdf$   https://content.bionames.org/sha1/$1   [R=301,L]
+RewriteRule ^sha1/([0-9a-f]{40})   		https://content.bionames.org/sha1/$1   [R=301,L]
+
+# --- Legacy PDF archive & misc: 410 Gone --------------------------------------
+# Remaining archived paths (issn/vol/page PDFs, documentcloud) can't be mapped
+# to a sha1 from the URL alone, so they stay Gone.
+# NOTE: pdfproxy.php is intentionally NOT included here - it is a live script.
+RewriteRule ^bionames-archive/   	-   [G]
+RewriteRule ^archive/   		-   [G]
+RewriteRule ^trees/   			-   [G]
+RewriteRule ^timeline/   		-   [G]
+RewriteRule ^bionames-api/   		-   [G]
+RewriteRule ^api/openurl   		-   [G]
 
 
 

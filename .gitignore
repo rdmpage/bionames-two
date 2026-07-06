@@ -9,3 +9,7 @@
 *.db-shm
 bionames-two.bbprojectd/project.lockfile
 bionames-two.bbprojectd/rpage.bbprojectsettings
+
+# Generated sitemap output (run generate_sitemap.php on the server)
+/sitemap.xml
+/sitemaps/
